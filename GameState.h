@@ -12,13 +12,19 @@ class GameState :
 private:
 	sf::Font font;
 	PausedMenu* pausemenu;
+	FightState* fight;
 
 	Player* player;
 
+	//enemies
 	Enemy* testenemy;
 	Enemy* blob;
 	Enemy* snake;
 
+	Enemy* activeEnemy;
+
+	std::vector<Enemy*> activeEnemies;
+	std::string enemyName;
 
 	//collision stuff
 	sf::FloatRect playerbox;
@@ -30,6 +36,8 @@ private:
 	void initializeFonts();
 	void initializeTextures();
 	void initializePauseMenu();
+	void initializeFight();
+	void initializeEnemy();
 	void CreateEnemy();
 	void initializePlayers();
 
@@ -41,7 +49,6 @@ public:
 	void updateInput(const float& dtime);
 	void updatePausedInput(const float& dtime);
 	void checkForCollision(const float& dtime);
-	void collision(const float& dtime);
 	void updatePausedMenuButtons();
 	void update(const float& dtime);
 	void render(sf::RenderTarget* target = nullptr);
