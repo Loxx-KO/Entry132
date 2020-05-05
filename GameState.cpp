@@ -35,11 +35,14 @@ void GameState::initializeFonts()
 
 void GameState::initializeTextures()
 {
-	if (!this->textures["PLAYER_IDLE_FRONT"].loadFromFile("Resources/Images/Sprites/Player/LiamFront_IDLE.png"))
+	//player textures
+
+	if (!this->textures["PLAYER_SHEET"].loadFromFile("Resources/Images/Sprites/Player/LiamSheet.png"))
 	{
 		throw "ERROR::GAME_STATE::PLAYER_IDLE_FRONT_TEXTURE_DIDN'T_LOAD_PROPERLY";
 	}
 
+	//enemy textures
 	if (!this->textures["TEST_ENEMY_IDLE"].loadFromFile("Resources/Images/Sprites/Enemy/testenemy.png"))
 	{
 		throw "ERROR::GAME_STATE::TEST_ENEMY_IDLE_TEXTURE_DIDN'T_LOAD_PROPERLY";
@@ -65,16 +68,28 @@ void GameState::initializePauseMenu()
 	this->pausemenu->addButton("QUIT", 760.f, 700.f, "Quit");
 }
 
+void GameState::initializeFight()
+{
+
+}
+
 void GameState::CreateEnemy()
 {
-	this->testenemy = new Enemy(400.f, 400.f, this->textures["TEST_ENEMY_IDLE"]);
-	this->blob = new Enemy(600.f, 700.f, this->textures["BLOB_ENEMY_IDLE"]);
-	this->snake = new Enemy(200.f, 300.f, this->textures["MECHA_SNAKE_IDLE"]);
+	this->testenemy = new Enemy(400.f, 400.f, this->textures["TEST_ENEMY_IDLE"], "testenemy");
+	this->blob = new Enemy(600.f, 700.f, this->textures["BLOB_ENEMY_IDLE"], "blob");
+	this->snake = new Enemy(200.f, 300.f, this->textures["MECHA_SNAKE_IDLE"], "snake");
+}
+
+void GameState::initializeEnemy()
+{
+	this->activeEnemies.push_back(this->testenemy);
+	this->activeEnemies.push_back(this->blob);
+	this->activeEnemies.push_back(this->snake);
 }
 
 void GameState::initializePlayers()
 {
-	this->player = new Player(20.f, 20.f, this->textures["PLAYER_IDLE_FRONT"]);
+	this->player = new Player(20.f, 20.f, this->textures["PLAYER_SHEET"], "ingame");
 }
 
 //Constructors/destructors
@@ -84,18 +99,24 @@ GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* suppo
 	this->initializeKeybinds();
 	this->initializeFonts();
 	this->initializeTextures();
+
 	this->initializePauseMenu();
+
 	this->initializePlayers();
 	this->CreateEnemy();
+	this->initializeEnemy();
 }
 
 GameState::~GameState()
 {
 	delete this->pausemenu;
+	delete this->fight;
+
 	delete this->player;
 	delete this->testenemy;
 	delete this->blob;
 	delete this->snake;
+	this->activeEnemies.clear();
 }
 
 //functions
@@ -103,18 +124,18 @@ void GameState::updateInput(const float& dtime)
 {
 	checkForCollision(dtime);
 
-	//player input
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_LEFT"))))
-		this->player->move(-1.f, 0.f, dtime);
+		//player input
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_LEFT"))))
+			this->player->move(-1.f, 0.f, dtime);
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_RIGHT"))))
-		this->player->move(1.f, 0.f ,dtime);
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_RIGHT"))))
+			this->player->move(1.f, 0.f, dtime);
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_UP"))))
-		this->player->move(0.f, -1.f, dtime);
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_UP"))))
+			this->player->move(0.f, -1.f, dtime);
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_DOWN"))))
-		this->player->move(0.f, 1.f, dtime);
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_DOWN"))))
+			this->player->move(0.f, 1.f, dtime);
 }
 
 void GameState::updatePausedInput(const float& dtime)
@@ -134,57 +155,60 @@ void GameState::updatePausedInput(const float& dtime)
 
 void GameState::checkForCollision(const float& dtime)
 {
-	if (this->testenemy->getGlobalBounds().intersects(this->player->getGlobalBounds()))
-	{
-		std::cout << "collision\n";
-		collision(dtime);
-	}
-}
-
-void GameState::collision(const float& dtime)
-{
 	this->playerbox = this->player->getGlobalBounds();
-	this->enemybox = this->testenemy->getGlobalBounds();
 
-		//player bottom collision
-		if (playerbox.top < enemybox.top
-		&& playerbox.top + playerbox.height < enemybox.top + enemybox.height
-		&& playerbox.left < enemybox.left + enemybox.width
-		&& playerbox.left + playerbox.width > enemybox.left)
-		{
-			player->setPosition(playerbox.left , enemybox.top - playerbox.height - 20.f);
-			this->player->stopSpeedY();
-		}
+	for (unsigned i = 0; i < this->activeEnemies.size(); i++)
+	{
+		this->activeEnemy = this->activeEnemies[i];
+		this->enemybox = this->activeEnemies[i]->getGlobalBounds();
+		this->enemyName = this->activeEnemies[i]->getName();
 
-		//player top collision
-		else if (playerbox.top > enemybox.top
-			&& playerbox.top + playerbox.height > enemybox.top + enemybox.height
-			&& playerbox.left < enemybox.left + enemybox.width
-			&& playerbox.left + playerbox.width > enemybox.left)
+		if (this->enemybox.intersects(this->playerbox))
 		{
-			player->setPosition(playerbox.left , enemybox.top + playerbox.height + 20.f);
-			this->player->stopSpeedY();
-		}
+			std::cout << "collision\n";
 
-		//player right collision
-		if (playerbox.left < enemybox.left
-			&& playerbox.left + playerbox.width < enemybox.left + enemybox.width
-			&& playerbox.top < enemybox.top + enemybox.height
-			&& playerbox.top + playerbox.height > enemybox.top)
-		{
-			player->setPosition(enemybox.left - enemybox.width - 10.f, playerbox.top);
-			this->player->stopSpeedX();
-		}
+			//bottom collision
+			if (playerbox.top < enemybox.top
+				&& playerbox.top + playerbox.height < enemybox.top + enemybox.height
+				&& playerbox.left < enemybox.left + enemybox.width
+				&& playerbox.left + playerbox.width > enemybox.left)
+			{
+				this->player->stopSpeedY();
+				this->player->setPosition(playerbox.left, enemybox.top - playerbox.height);
+			}
 
-		//left player collision
-		else if (playerbox.left > enemybox.left
-			&& playerbox.left + playerbox.width > enemybox.left + enemybox.width
-			&& playerbox.top < enemybox.top + enemybox.height
-			&& playerbox.top + playerbox.height > enemybox.top)
-		{
-			player->setPosition(enemybox.left + enemybox.width + 10.f, playerbox.top);
-			this->player->stopSpeedX();
+			//top collision
+			else if (playerbox.top > enemybox.top
+				&& playerbox.top + playerbox.height > enemybox.top + enemybox.height
+				&& playerbox.left < enemybox.left + enemybox.width
+				&& playerbox.left + playerbox.width > enemybox.left)
+			{
+				this->player->stopSpeedY();
+				this->player->setPosition(playerbox.left, enemybox.top + enemybox.height);
+			}
+
+			//right collision
+			if (playerbox.left < enemybox.left
+				&& playerbox.left + playerbox.width < enemybox.left + enemybox.width
+				&& playerbox.top < enemybox.top + enemybox.height
+				&& playerbox.top + playerbox.height > enemybox.top)
+			{
+				this->player->stopSpeedX();
+				this->player->setPosition(enemybox.left - playerbox.width, playerbox.top);
+			}
+
+			//left collision
+			else if (playerbox.left > enemybox.left
+				&& playerbox.left + playerbox.width > enemybox.left + enemybox.width
+				&& playerbox.top < enemybox.top + enemybox.height
+				&& playerbox.top + playerbox.height > enemybox.top)
+			{
+				this->player->stopSpeedX();
+				this->player->setPosition(enemybox.left + enemybox.width, playerbox.top);
+			}
+			this->states->push(new FightState(this->window, this->supportedKeys, this->states, this->activeEnemies[i], this->enemyName));
 		}
+	}
 }
 
 void GameState::updatePausedMenuButtons()
