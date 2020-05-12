@@ -3,14 +3,28 @@
 
 void FightState::initializeVariables()
 {
-	this->dead = false;
+	this->enemydead = false;
+	this->playerdead = false;
+	this->turn = true;
+
 	this->enemyCount = 1;
 	this->gainEXP = 0;
+	this->playerHpTemp = playerHp;
 }
 
 void FightState::initializeTextures()
 {
 	if (!this->textures["FIGHT_IDLE"].loadFromFile("Resources/Images/Sprites/Player/FightState_Liam.png"))
+	{
+		throw "ERROR::FIGHT_STATE::PLAYER_FIGHT_FRONT_TEXTURE_DIDN'T_LOAD_PROPERLY";
+	}
+
+	if (!this->textures["BAR"].loadFromFile("Resources/Images/Bars/barbg.png"))
+	{
+		throw "ERROR::FIGHT_STATE::PLAYER_FIGHT_FRONT_TEXTURE_DIDN'T_LOAD_PROPERLY";
+	}
+
+	if (!this->textures["HP"].loadFromFile("Resources/Images/Bars/hpbar.png"))
 	{
 		throw "ERROR::FIGHT_STATE::PLAYER_FIGHT_FRONT_TEXTURE_DIDN'T_LOAD_PROPERLY";
 	}
@@ -34,10 +48,16 @@ void FightState::initializeTextures()
 void FightState::initializePlayer()
 {
 	this->player_fight = new Player(300.f, 270.f, this->textures["FIGHT_IDLE"], "infight");
+
+	playerDMG = (rand() % player_fight->getStatsMaxDMG() + player_fight->getStatsBaseDMG());
+
 	this->playerHp = this->player_fight->getStatsHP();
 	this->playerDef = this->player_fight->getStatsDefence();
 	this->playerMana = this->player_fight->getStatsMana();
 	this->playerExp = this->player_fight->getStatsExp();
+
+	std::cout << "\nPLAYER DMG" << playerDMG << "\nHP" << playerHp << "\nDEF" << playerDef << "\nEXP" << playerExp << "\n";
+	this->initializeBars();
 }
 
 void FightState::initializeBackground()
@@ -83,25 +103,48 @@ void FightState::initializeKeybinds()
 
 void FightState::initializeButtons()
 {
+	//fighting
 	this->buttons["FIGHT"] = new Button(40.f, 950.f, 355.f, 70.f,
 		&this->font, "fight", 34,
 		sf::Color(237, 221, 226, 200), sf::Color(247, 218, 231, 200), sf::Color(255, 235, 244, 200),
 		sf::Color(125, 1, 47, 200), sf::Color(145, 1, 55, 200), sf::Color(166, 2, 63, 200));
 
+	//defending
 	this->buttons["DEFEND"] = new Button(525.f, 950.f, 355.f, 70.f,
 		&this->font, "defend", 34,
 		sf::Color(237, 221, 226, 200), sf::Color(247, 218, 231, 200), sf::Color(255, 235, 244, 200),
 		sf::Color(125, 1, 47, 200), sf::Color(145, 1, 55, 200), sf::Color(166, 2, 63, 200));
 
+	//items
 	this->buttons["USE_ITEM"] = new Button(1010.f, 950.f, 355.f, 70.f,
 		&this->font, "use item", 34,
 		sf::Color(237, 221, 226, 200), sf::Color(247, 218, 231, 200), sf::Color(255, 235, 244, 200),
 		sf::Color(125, 1, 47, 200), sf::Color(145, 1, 55, 200), sf::Color(166, 2, 63, 200));
 
+	//runnin
 	this->buttons["RUN"] = new Button(1495.f, 950.f, 355.f, 70.f,
 		&this->font, "run", 34,
 		sf::Color(237, 221, 226, 200), sf::Color(247, 218, 231, 200), sf::Color(255, 235, 244, 200),
 		sf::Color(125, 1, 47, 200), sf::Color(145, 1, 55, 200), sf::Color(166, 2, 63, 200));
+}
+
+void FightState::initializeBars()
+{
+	//player
+	this->playerBar = new Bar(40.f, 650.f, playerBarWidth + 10.f, 40.f, &this->textures["BAR"]);
+
+	this->playerBarWidth = playerHp * 1.f;
+	this->PlayerBarHp.setPosition(45.f, 655.f);
+	this->PlayerBarHp.setTexture(&this->textures["HP"]);
+	this->PlayerBarHp.setSize(sf::Vector2f(playerBarWidth, 30.f));
+
+	//enemy
+	this->enemyBar = new Bar(1010.f, 650.f, (enemyBarWidth*enemyCount) + 10.f , 40.f, &this->textures["BAR"]);
+
+	this->enemyBarWidth = enemyHp * 1.f;
+	this->enemyBarHp.setPosition(1015.f, 655.f);
+	this->enemyBarHp.setTexture(&this->textures["HP"]);
+	this->enemyBarHp.setSize(sf::Vector2f(enemyBarWidth, 30.f));
 }
 
 FightState::FightState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<States*>* states, Enemy* enemy, std::string enemyName)
@@ -115,8 +158,9 @@ FightState::FightState(sf::RenderWindow* window, std::map<std::string, int>* sup
 	this->initializeKeybinds();
 	this->initializeButtons();
 
-	this->enemyCount = rand() % 4 + 1;
+	this->enemyCount = rand() % 3 + 1;
 	this->enemies = new Enemy * [this->enemyCount];
+	this->enemyHp = 0;
 	float offsetx = 0.f;
 	float offsety = 0.f;
 
@@ -125,40 +169,57 @@ FightState::FightState(sf::RenderWindow* window, std::map<std::string, int>* sup
 	{
 		for (int i = 0; i < this->enemyCount; i++)
 		{
-			this->enemies[i] = new Enemy(1100.f + offsetx, 50.f + offsety, this->textures["TESTENEMY_FIGHT"], enemyName);
+			this->enemies[i] = new Enemy(1100.f + offsetx, 50.f + offsety, this->textures["TESTENEMY_FIGHT"], enemyName, INFIGHT);
+			currentEnemies.push_back(enemies[i]);
+
 			offsetx += 20.f;
 			offsety += 20.f;
-			this->enemyHp = enemies[i]->getEnemyHP() * (this->enemyCount);
+			runChance = 9;
+
+			this->enemyHp = enemies[i]->getEnemyHP() + this->enemyHp;
 			this->enemyExp = enemies[i]->getEnemyExp() * (this->enemyCount);
+			this->enemyDMG = (rand() % enemies[i]->getEnemyMaxDMG() + enemies[i]->getEnemyBaseDMG()) * (this->enemyCount);
+			this->initializeBars();
 		}
 	}
 
-	if (enemyName == "blob")
+	else if (enemyName == "blob")
 	{
 		for (int i = 0; i < this->enemyCount; i++)
 		{
-			this->enemies[i] = new Enemy(1100.f + offsetx, 50.f + offsety, this->textures["BLOB_FIGHT"], enemyName);
+			this->enemies[i] = new Enemy(1100.f + offsetx, 50.f + offsety, this->textures["BLOB_FIGHT"], enemyName, INFIGHT);
+			currentEnemies.push_back(enemies[i]);
+
 			offsetx += 20.f;
 			offsety += 20.f;
-			this->enemyHp = enemies[i]->getEnemyHP() * (this->enemyCount);
+			runChance = 9;
+
+			this->enemyHp = enemies[i]->getEnemyHP() + this->enemyHp;
 			this->enemyExp = enemies[i]->getEnemyExp() * (this->enemyCount);
+			this->enemyDMG = (rand() % enemies[i]->getEnemyMaxDMG() + enemies[i]->getEnemyBaseDMG()) * (this->enemyCount);
+			this->initializeBars();
 		}
 	}
 
-	if (enemyName == "snake")
+	else if (enemyName == "snake")
 	{
 		for (int i = 0; i < this->enemyCount; i++)
 		{
-			this->enemies[i] = new Enemy(1100.f + offsetx, 50.f + offsety, this->textures["SNAKE_FIGHT"], enemyName);
+			this->enemies[i] = new Enemy(1100.f + offsetx, 50.f + offsety, this->textures["SNAKE_FIGHT"], enemyName, INFIGHT);
+			currentEnemies.push_back(enemies[i]);
+
 			offsetx += 20.f;
 			offsety += 20.f;
-			this->enemyHp = enemies[i]->getEnemyHP() * (this->enemyCount);
+			runChance = 8;
+
+			this->enemyHp = enemies[i]->getEnemyHP() + this->enemyHp;
 			this->enemyExp = enemies[i]->getEnemyExp() * (this->enemyCount);
+			this->enemyDMG = (rand() % enemies[i]->getEnemyMaxDMG() + enemies[i]->getEnemyBaseDMG()) * (this->enemyCount);
+			this->initializeBars();
 		}
 	}
 
-	std::cout << "\n hp" << enemyHp << enemyName << "\n exp" << enemyExp;			//for testing del later
-	std::cout << "\n hp" << playerHp << "\n mana" << playerMana << "\n exp" << playerExp;
+	std::cout << "\nENEMY  hp" << enemyHp << enemyName << "\n exp" << enemyExp << "\nDMG" << enemyDMG;			//for testing del later
 }
 
 FightState::~FightState()
@@ -169,14 +230,131 @@ FightState::~FightState()
 		delete it->second;
 	}
 
-	for (int i = 0; i < enemyCount; ++i)
+	for (int i = 0; i < enemyCount; i++)
 	{
 		delete[] enemies[i];
 	}
 	delete[] enemies;
 
+	this->currentEnemies.clear();
 	delete this->player_fight;
-} 
+
+	delete this->enemyBar;
+	delete this->playerBar;
+}
+
+//functions
+void FightState::enemyAttack()
+{
+	playerHpTemp = playerHp;
+	playerHp = playerHp - enemyDMG;
+
+	playerBarWidth = playerHp * 1.f;
+
+	std::cout << "\nenemy attack PlayerHP:" << playerHp << "\n";
+
+	if (playerHp <= 0)
+	{
+		playerdead = true;
+	}
+}
+
+void FightState::attack()
+{
+	enemyHpTemp = enemyHp;
+	enemyHp = enemyHp - playerDMG;
+
+	enemyBarWidth = enemyHp * 1.f;
+
+	std::cout << "\nplayer attack, EnemyHP:" << enemyHp << "\n";
+
+	if (enemyHp <= 0)
+	{
+		enemydead = true;
+	}
+}
+
+void FightState::defend()
+{
+	playerHpTemp = playerHp;
+
+	playerBarWidth = playerHp * 1.f;
+
+	if(playerDef < enemyDMG)
+		playerHp = playerHp + playerDef - enemyDMG;
+
+	std::cout << "\nplayer defence PlayerHP:" << playerHp << "\n";
+
+	if (playerHp <= 0)
+	{
+		playerdead = true;
+	}
+}
+
+void FightState::useItem()
+{
+	std::cout << "\nusing item\n";
+}
+
+void FightState::tryRun()
+{
+	int escaped = rand() % 10 + 1;
+	if (this->runChance >= escaped)
+	{
+		this->states->pop();
+		turn = true;
+	}
+	else
+	{
+		std::cout << "\nCouldn't escape the battle!\n";
+		turn = false;
+	}
+}
+
+void FightState::checkIfAnyoneDead()
+{
+	if (enemydead == true)
+	{
+		std::cout << "wygrana\n";
+		playerExp = playerExp + enemyExp;
+		std::cout << "EXP gain: " << playerExp << "\n";
+
+		currentEnemies.clear();
+		this->states->pop();
+
+		turn = true;
+	}
+	else if (playerdead == true)
+	{
+		playerHp = 1;
+
+		playerBarWidth = 1 * 1.f;
+
+		std::cout << "porażka\n";
+
+		this->states->pop();
+
+		turn = true;
+	}
+}
+
+void FightState::changeBarSize()
+{
+	this->playerBarWidth = playerHp * 1.f;
+	this->PlayerBarHp.setSize(sf::Vector2f(playerBarWidth, 30.f));
+
+	this->enemyBarWidth = enemyHp * 1.f;
+	this->enemyBarHp.setSize(sf::Vector2f(enemyBarWidth, 30.f));
+}
+
+//bool FightState::enemyDead()
+//{
+//	if (death == true)
+//	{
+//		return true;
+//	}
+//	return false;
+//}
 
 void FightState::updateInput(const float& dtime)
 {
@@ -191,29 +369,62 @@ void FightState::updateButtons()
 	}
 
 	//fighting
-	if (this->buttons["FIGHT"]->isPressed())
+	if (turn == true)
 	{
-		std::cout << "fight\n";
 
-		this->buttons.clear();
+		if (this->buttons["FIGHT"]->isPressed())
+		{
+			sleepFor();
+
+			attack();
+			changeBarSize();
+			turn = false;
+		}
+
+		//fighting
+		if (this->buttons["DEFEND"]->isPressed())
+		{
+			sleepFor();
+
+			defend();
+			changeBarSize();
+			turn = false;
+		}
+
+		//fighting
+		if (this->buttons["USE_ITEM"]->isPressed())
+		{
+			sleepFor();
+
+			useItem();
+			changeBarSize();
+			turn = false;
+		}
+
+		//Finish fight
+		if (this->buttons["RUN"]->isPressed())
+		{
+			sleepFor();
+
+			tryRun();
+
+			changeBarSize();
+			turn = true;
+		}
+		checkIfAnyoneDead();
 	}
 
-	//fighting
-	if (this->buttons["DEFEND"]->isPressed())
+	//enemyTurn
+	if (turn == false)
 	{
-		std::cout << "defend\n";
-	}
+		sleepFor();
 
-	//fighting
-	if (this->buttons["USE_ITEM"]->isPressed())
-	{
-		std::cout << "using item\n";
-	}
+		enemyAttack();
 
-	//Finish fight
-	if (this->buttons["RUN"]->isPressed())
-	{
-		this->states->pop();
+		changeBarSize();
+		checkIfAnyoneDead();
+
+		turn = true;
 	}
 }
 
@@ -222,7 +433,20 @@ void FightState::update(const float& dtime)
 	this->updateMousePositions();
 	this->updateInput(dtime);
 
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{
+		for (auto i : this->buttons)
+		{
+			i.second->updateButtonTime(dtime);
+		}
+	}
+
 	this->updateButtons();
+}
+
+void FightState::sleepFor()
+{
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
 void FightState::renderButtons(sf::RenderTarget& target)
@@ -235,6 +459,11 @@ void FightState::renderButtons(sf::RenderTarget& target)
 	{
 		this->enemies[i]->render(target);
 	}
+	this->playerBar->render(target);
+	target.draw(PlayerBarHp);
+
+	this->enemyBar->render(target);
+	target.draw(enemyBarHp);
 }
 
 void FightState::render(sf::RenderTarget* target)
