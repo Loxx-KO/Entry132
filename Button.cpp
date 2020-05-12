@@ -6,6 +6,10 @@ Button::Button(float x, float y, float width, float height,
 	sf::Color text_idle_color, sf::Color text_hover_color, sf::Color text_active_color,
 	sf::Color idleColor, sf::Color hoverColor, sf::Color pressedColor)
 {
+	//button time 
+	this->buttonTime = 0.f;
+	this->buttonTimeMax = 5.f;
+
 	//button
 	this->buttonState = BUTTON_IDLE;
 
@@ -91,6 +95,27 @@ void Button::update(const sf::Vector2f& mousePosition)
 		this->buttonshape.setFillColor(sf::Color::Red);	
 		this->buttontext.setFillColor(sf::Color::Black); //"error"
 		break;
+	}
+
+}
+
+const bool Button::getButtonTime()
+{
+	if (this->buttonTime >= this->buttonTimeMax)
+	{
+		//resets the button time
+		this->buttonTime = 0.f;
+		return true;
+	}
+
+	return false;
+}
+
+void Button::updateButtonTime(const float& dtime)
+{
+	if (this->buttonTime < this->buttonTimeMax)
+	{
+		this->buttonTime += 100.f * dtime;
 	}
 }
 
