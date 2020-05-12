@@ -14,6 +14,9 @@ private:
 	//button state
 	short unsigned buttonState;
 
+	float buttonTime;
+	float buttonTimeMax;
+
 	sf::RectangleShape buttonshape;
 	sf::Font* font;
 	sf::Text buttontext;
@@ -38,9 +41,10 @@ public:
 	~Button();
 	//accessors
 	const bool isPressed() const;					//checks if button is pressed
+	const bool getButtonTime();
 
 	//functions
+	virtual void updateButtonTime(const float& dtime);
 	void update(const sf::Vector2f& mousePosition);
 	void render(sf::RenderTarget& target);
 };
-
