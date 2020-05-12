@@ -75,9 +75,9 @@ void GameState::initializeFight()
 
 void GameState::CreateEnemy()
 {
-	this->testenemy = new Enemy(400.f, 400.f, this->textures["TEST_ENEMY_IDLE"], "testenemy");
-	this->blob = new Enemy(600.f, 700.f, this->textures["BLOB_ENEMY_IDLE"], "blob");
-	this->snake = new Enemy(200.f, 300.f, this->textures["MECHA_SNAKE_IDLE"], "snake");
+	this->testenemy = new Enemy(400.f, 400.f, this->textures["TEST_ENEMY_IDLE"], "testenemy", INGAME);
+	this->blob = new Enemy(600.f, 700.f, this->textures["BLOB_ENEMY_IDLE"], "blob", INGAME);
+	this->snake = new Enemy(200.f, 300.f, this->textures["MECHA_SNAKE_IDLE"], "snake", INGAME);
 }
 
 void GameState::initializeEnemy()
@@ -110,13 +110,18 @@ GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* suppo
 GameState::~GameState()
 {
 	delete this->pausemenu;
-	delete this->fight;
+	delete this->fightstate;
 
 	delete this->player;
 	delete this->testenemy;
 	delete this->blob;
 	delete this->snake;
 	this->activeEnemies.clear();
+}
+
+void GameState::deleteEnemy(const int i)
+{
+	delete this->activeEnemies[i];
 }
 
 //functions
@@ -152,6 +157,11 @@ void GameState::updatePausedInput(const float& dtime)
 		}
 	}
 }
+
+//void GameState::updateFightState(const float& dtime)
+//{
+//
+//}
 
 void GameState::checkForCollision(const float& dtime)
 {
@@ -206,7 +216,12 @@ void GameState::checkForCollision(const float& dtime)
 				this->player->stopSpeedX();
 				this->player->setPosition(enemybox.left + enemybox.width, playerbox.top);
 			}
-			this->states->push(new FightState(this->window, this->supportedKeys, this->states, this->activeEnemies[i], this->enemyName));
+			this->fightstate = new FightState(this->window, this->supportedKeys, this->states, this->activeEnemies[i], this->enemyName);
+			this->states->push(this->fightstate);
+			/*if (this->fightstate->enemyDeath() == true)
+			{
+				delete this->activeEnemies[i];
+			}*/
 		}
 	}
 }
@@ -231,15 +246,19 @@ void GameState::update(const float& dtime)
 	this->updateMousePositions();
 
 	//unpaused update
-	if (!this->paused)				
+	if (!this->paused)
 	{
 		this->updateInput(dtime);
 
 		this->player->update(dtime);
 
-		this->testenemy->update(dtime);
-		this->blob->update(dtime);
-		this->snake->update(dtime);
+		for (unsigned i = 0; i < this->activeEnemies.size(); i++)
+		{
+			this->activeEnemies[i]->update(dtime);
+			/*this->testenemy->update(dtime);
+			this->blob->update(dtime);
+			this->snake->update(dtime);*/
+		}
 	}
 	//pause update
 	else
