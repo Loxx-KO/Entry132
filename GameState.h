@@ -12,7 +12,6 @@ class GameState :
 private:
 	sf::Font font;
 	PausedMenu* pausemenu;
-	FightState* fight;
 
 	Player* player;
 
@@ -30,6 +29,8 @@ private:
 	sf::FloatRect playerbox;
 	sf::FloatRect enemybox;
 
+	FightState* fightstate;
+
 	//functions
 	void initializeVariables();
 	void initializeKeybinds();
@@ -46,12 +47,12 @@ public:
 	virtual ~GameState();
 
 	//functions
+	void deleteEnemy(const int i);
 	void updateInput(const float& dtime);
 	void updatePausedInput(const float& dtime);
+	//void updateFightState(const float& dtime);
 	void checkForCollision(const float& dtime);
 	void updatePausedMenuButtons();
 	void update(const float& dtime);
 	void render(sf::RenderTarget* target = nullptr);
 	//nullptr - deafult argument, nullptr will appear only here
-};
-
