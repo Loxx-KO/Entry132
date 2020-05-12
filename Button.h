@@ -4,7 +4,7 @@
 enum button_states		//list of values for button states
 {
 	BUTTON_IDLE = 0,
-    BUTTON_HOVER,
+    	BUTTON_HOVER,
 	BUTTON_PRESSED
 };
 
