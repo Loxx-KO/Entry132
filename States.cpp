@@ -1,15 +1,20 @@
 #include "pch.h"
 #include "States.h"
 
-States::States(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<States*>* states)
+States::States(StateData* state_data)
 {
-	this->window = window;
-	this->supportedKeys = supportedKeys;
-	this->states = states;
+	this->stateData = state_data;
+	this->window = state_data->window;
+	this->supportedKeys = state_data->supportedKeys;
+	this->states = state_data->states;
+
 	this->end = false;
 	this->paused = false;
+	this->fight = false;
+
 	this->keytime = 0.f;
-	this->keytimemax = 10.f;
+	this->keytimemax = 20.f;
+	this->gridSize = state_data->gridSize;
 }
 
 States::~States()
@@ -51,6 +56,16 @@ void States::unPausedState()
 	this->paused = false;
 }
 
+void States::fightStateNotActive()
+{
+	this->fight = false;
+}
+
+void States::fightStateEnding()
+{
+	this->fight = true;
+}
+
 
 void States::updateKeyTime(const float& dtime)
 {
@@ -60,9 +75,20 @@ void States::updateKeyTime(const float& dtime)
 	}
 }
 
-void States::updateMousePositions()
+void States::updateMousePositions(sf::View* view)
 {
 	this->mousePositionScreen = sf::Mouse::getPosition();
 	this->mousePositionWindow = sf::Mouse::getPosition(*this->window);
+
+	if(view)
+		this->window->setView(*view);
+
 	this->mousePositionView = this->window->mapPixelToCoords(sf::Mouse::getPosition(*this->window));
+	this->mousePositionGrid = 
+		sf::Vector2u(
+			static_cast<unsigned> (this->mousePositionView.x) / 50,			//static_cast<unsigned> (this->gridSize)
+			static_cast<unsigned> (this->mousePositionView.y) / 50
+		);
+
+	this->window->setView(this->window->getDefaultView());
 }
