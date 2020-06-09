@@ -3,33 +3,7 @@
   "$schema": "http://json.schemastore.org/sarif-2.0.0",
   "runs": [
     {
-      "results": [
-        {
-          "ruleId": "26495",
-          "message": {
-            "text": "Zmienna „AnimationComponent::Animation::timer” jest niezainicjowana. Zawsze inicjuj zmienną składową (type.6)."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "fileLocation": {
-                  "uri": "file:///C:/Users/klauo/Documents/Programing/Entry 132/Entry 132/AnimationComponent.cpp"
-                },
-                "region": {
-                  "startLine": 36,
-                  "startColumn": 32,
-                  "endLine": 36,
-                  "endColumn": 32
-                }
-              },
-              "fullyQualifiedLogicalName": "public: __thiscall AnimationComponent::Animation::Animation(class sf::Sprite &,class sf::Texture &,float,int,int,int,int,int,int)"
-            }
-          ],
-          "properties": {
-            "targetSymbol": "AnimationComponent::Animation::timer"
-          }
-        }
-      ],
+      "results": [],
       "tool": {
         "name": "PREfast",
         "fullName": "PREfast Code Analysis",
@@ -38,10 +12,21 @@
       },
       "invocations": [
         {
-          "commandLine": "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.24.28314\\bin\\HostX86\\x86\\c1xx.dll\" -ACf{1F7B090C-16DB-4822-966A-A93D26ED4681} -ACpmspft140.dll -Alint -D_PREFAST_ -D_AST_FE_ -Analyze -zm0x008E3180 -il C:\\Users\\klauo\\AppData\\Local\\Temp\\_CL_3503f7f7ast -typedil -f AnimationComponent.cpp -Ze -D_MSC_EXTENSIONS -Zp8 -Gs -pc \\:/ -D_MSC_VER=1924 -D_MSC_FULL_VER=192428316 -D_MSC_BUILD=0 -D_WIN32 -D_M_IX86=600 -D_M_IX86_FP=2 -GR -D_CPPRTTI -I C:\\Users\\klauo\\Documents\\Programing\\Entry 132\\External\\SFML\\include -nologo -W 3 -diagnostics:column -D_GUARDOVERFLOW_CRT_ALLOCATORS=1 -Ot -DCODE_ANALYSIS -DWIN32 -D_DEBUG -D_CONSOLE -D_UNICODE -DUNICODE -EHs -D_CPPUNWIND -EHc -D__MSVC_RUNTIME_CHECKS -RTCs -RTCu -D_DEBUG -D_MT -D_DLL -GS -D_M_FP_PRECISE -permissive- -Zc:wchar_t -Zc:forScope -Yupch.h -FpDebug\\Entry 132.pch -FoDebug\\AnimationComponent.obj -FdDebug\\vc142.pdb -Gd -analyze:projectdirectory C:\\Users\\klauo\\Documents\\Programing\\Entry 132\\Entry 132\\ -analyze:rulesetdirectory ;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Team Tools\\Static Analysis Tools\\\\Rule Sets; -analyze:ruleset C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Team Tools\\Static Analysis Tools\\Rule Sets\\NativeRecommendedRules.ruleset -analyze:quiet -analyze:plugin C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.24.28314\\bin\\HostX86\\x86\\EspXEngine.dll -FC -errorreport:prompt -I C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.24.28314\\include -I C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.24.28314\\atlmfc\\include -I C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\VS\\include -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.18362.0\\ucrt -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.18362.0\\um -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.18362.0\\shared -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.18362.0\\winrt -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.18362.0\\cppwinrt -I C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.8\\Include\\um"
+          "commandLine": "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.24.28314\\bin\\HostX86\\x86\\c1xx.dll\" -ACf{1F7B090C-16DB-4822-966A-A93D26ED4681} -ACpmspft140.dll -Alint -D_PREFAST_ -D_AST_FE_ -Analyze -zm0x00FC3180 -il C:\\Users\\klauo\\AppData\\Local\\Temp\\_CL_61ddfdfeast -typedil -f AnimationComponent.cpp -Ze -D_MSC_EXTENSIONS -Zp8 -Gs -pc \\:/ -D_MSC_VER=1924 -D_MSC_FULL_VER=192428316 -D_MSC_BUILD=0 -D_WIN32 -D_M_IX86=600 -D_M_IX86_FP=2 -GR -D_CPPRTTI -I C:\\Users\\klauo\\Documents\\Programing\\Entry 132\\External\\SFML\\include -nologo -W 3 -diagnostics:column -D_GUARDOVERFLOW_CRT_ALLOCATORS=1 -Ot -DCODE_ANALYSIS -DWIN32 -D_DEBUG -D_CONSOLE -D_UNICODE -DUNICODE -EHs -D_CPPUNWIND -EHc -D__MSVC_RUNTIME_CHECKS -RTCs -RTCu -D_DEBUG -D_MT -D_DLL -GS -D_M_FP_PRECISE -permissive- -Zc:wchar_t -Zc:forScope -Yupch.h -FpDebug\\Entry 132.pch -FoDebug\\AnimationComponent.obj -FdDebug\\vc142.pdb -Gd -analyze:projectdirectory C:\\Users\\klauo\\Documents\\Programing\\Entry 132\\Entry 132\\ -analyze:rulesetdirectory ;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Team Tools\\Static Analysis Tools\\\\Rule Sets; -analyze:ruleset C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Team Tools\\Static Analysis Tools\\Rule Sets\\NativeRecommendedRules.ruleset -analyze:quiet -analyze:plugin C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.24.28314\\bin\\HostX86\\x86\\EspXEngine.dll -FC -errorreport:prompt -I C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.24.28314\\include -I C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.24.28314\\atlmfc\\include -I C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\VS\\include -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.18362.0\\ucrt -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.18362.0\\um -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.18362.0\\shared -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.18362.0\\winrt -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.18362.0\\cppwinrt -I C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.8\\Include\\um"
         }
       ],
       "files": {
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/textureselector.cpp": {
+          "roles": [
+            "analysisTarget",
+            "resultFile"
+          ]
+        },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/animationcomponent.h": {
+          "roles": [
+            "resultFile"
+          ]
+        },
         "file:///c:/users/klauo/documents/programing/entry 132/external/sfml/include/sfml/graphics/rect.inl": {
           "roles": [
             "resultFile"
@@ -59,17 +44,6 @@
         },
         "file:///c:/users/klauo/documents/programing/entry 132/external/sfml/include/sfml/window/contextsettings.hpp": {
           "roles": [
-            "resultFile"
-          ]
-        },
-        "file:///c:/users/klauo/documents/programing/entry 132/external/sfml/include/sfml/system/vector2.hpp": {
-          "roles": [
-            "resultFile"
-          ]
-        },
-        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/tilemap.cpp": {
-          "roles": [
-            "analysisTarget",
             "resultFile"
           ]
         },
@@ -280,6 +254,11 @@
           ]
         },
         "file:///c:/users/klauo/documents/programing/entry 132/external/sfml/include/sfml/system/threadlocalptr.inl": {
+          "roles": [
+            "resultFile"
+          ]
+        },
+        "file:///c:/users/klauo/documents/programing/entry 132/external/sfml/include/sfml/system/vector2.hpp": {
           "roles": [
             "resultFile"
           ]
@@ -525,6 +504,11 @@
             "resultFile"
           ]
         },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/textureselector.h": {
+          "roles": [
+            "resultFile"
+          ]
+        },
         "file:///c:/users/klauo/documents/programing/entry 132/external/sfml/include/sfml/audio/soundrecorder.hpp": {
           "roles": [
             "resultFile"
@@ -542,6 +526,12 @@
         },
         "file:///c:/users/klauo/documents/programing/entry 132/external/sfml/include/sfml/audio/soundfilereader.hpp": {
           "roles": [
+            "resultFile"
+          ]
+        },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/graphicssettings.cpp": {
+          "roles": [
+            "analysisTarget",
             "resultFile"
           ]
         },
@@ -605,34 +595,8 @@
             "resultFile"
           ]
         },
-        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/tilemap.h": {
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/button.h": {
           "roles": [
-            "resultFile"
-          ]
-        },
-        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/tile.h": {
-          "roles": [
-            "resultFile"
-          ]
-        },
-        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/entity.h": {
-          "roles": [
-            "resultFile"
-          ]
-        },
-        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/hitboxcomponent.h": {
-          "roles": [
-            "resultFile"
-          ]
-        },
-        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/animationcomponent.h": {
-          "roles": [
-            "resultFile"
-          ]
-        },
-        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/tile.cpp": {
-          "roles": [
-            "analysisTarget",
             "resultFile"
           ]
         },
@@ -647,7 +611,55 @@
             "resultFile"
           ]
         },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/entity.h": {
+          "roles": [
+            "resultFile"
+          ]
+        },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/hitboxcomponent.h": {
+          "roles": [
+            "resultFile"
+          ]
+        },
         "file:///c:/users/klauo/documents/programing/entry 132/entry 132/enemy.h": {
+          "roles": [
+            "resultFile"
+          ]
+        },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/graphicssettings.h": {
+          "roles": [
+            "resultFile"
+          ]
+        },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/settingsstate.cpp": {
+          "roles": [
+            "analysisTarget",
+            "resultFile"
+          ]
+        },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/settingsstate.h": {
+          "roles": [
+            "resultFile"
+          ]
+        },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/playerstats.cpp": {
+          "roles": [
+            "analysisTarget",
+            "resultFile"
+          ]
+        },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/playerstats.h": {
+          "roles": [
+            "resultFile"
+          ]
+        },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/pausedmenu.cpp": {
+          "roles": [
+            "analysisTarget",
+            "resultFile"
+          ]
+        },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/pausedmenu.h": {
           "roles": [
             "resultFile"
           ]
@@ -675,22 +687,22 @@
             "resultFile"
           ]
         },
-        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/pausedmenu.h": {
-          "roles": [
-            "resultFile"
-          ]
-        },
-        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/button.h": {
-          "roles": [
-            "resultFile"
-          ]
-        },
         "file:///c:/users/klauo/documents/programing/entry 132/entry 132/fightstate.h": {
           "roles": [
             "resultFile"
           ]
         },
-        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/settingsstate.h": {
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/bar.h": {
+          "roles": [
+            "resultFile"
+          ]
+        },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/tilemap.h": {
+          "roles": [
+            "resultFile"
+          ]
+        },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/tile.h": {
           "roles": [
             "resultFile"
           ]
@@ -732,6 +744,12 @@
           ]
         },
         "file:///c:/users/klauo/documents/programing/entry 132/entry 132/editorstate.cpp": {
+          "roles": [
+            "analysisTarget",
+            "resultFile"
+          ]
+        },
+        "file:///c:/users/klauo/documents/programing/entry 132/entry 132/bar.cpp": {
           "roles": [
             "analysisTarget",
             "resultFile"

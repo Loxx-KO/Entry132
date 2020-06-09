@@ -1,2 +1,8 @@
-﻿  GameState.cpp
+﻿  Entry 132.cpp
+  FightState.cpp
+  Game.cpp
+  GameOver.cpp
+  GameState.cpp
+  MainMenuState.cpp
+  Generowanie kodu...
   Entry 132.vcxproj -> C:\Users\klauo\Documents\Programing\Entry 132\Debug\Entry 132.exe
