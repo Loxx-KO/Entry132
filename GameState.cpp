@@ -1,12 +1,29 @@
 #include "pch.h"
 #include "GameState.h"
 
-void GameState::initializeVariables()
+void GameState::initializeDeferredRender()
 {
-	this->playerbox = this->player->getGlobalBounds();
+	this->renderTexture.create(
+		this->stateData->gfxSettings->resolution.width, this->stateData->gfxSettings->resolution.height
+	);
+
+	this->renderSprite.setTexture(this->renderTexture.getTexture());
+	this->renderSprite.setTextureRect(sf::IntRect(0, 0, this->stateData->gfxSettings->resolution.width, this->stateData->gfxSettings->resolution.height));
+
 }
 
 //initializer functions
+void GameState::initializeVariables()
+{
+
+}
+
+void GameState::initializeView()
+{
+	this->view.setSize(sf::Vector2f(static_cast<float>(this->stateData->gfxSettings->resolution.width), static_cast<float>(this->stateData->gfxSettings->resolution.height)));
+	this->view.setCenter(sf::Vector2f(this->stateData->gfxSettings->resolution.width / 2.f, this->stateData->gfxSettings->resolution.height / 2.f));
+}
+
 void GameState::initializeKeybinds()
 {
 	std::ifstream file("Config/gamestate_keybinds.ini");
@@ -68,60 +85,62 @@ void GameState::initializePauseMenu()
 	this->pausemenu->addButton("QUIT", 760.f, 700.f, "Quit");
 }
 
-void GameState::initializeFight()
+void GameState::initializeTileMap()
 {
-
-}
-
-void GameState::CreateEnemy()
-{
-	this->testenemy = new Enemy(400.f, 400.f, this->textures["TEST_ENEMY_IDLE"], "testenemy", INGAME);
-	this->blob = new Enemy(600.f, 700.f, this->textures["BLOB_ENEMY_IDLE"], "blob", INGAME);
-	this->snake = new Enemy(200.f, 300.f, this->textures["MECHA_SNAKE_IDLE"], "snake", INGAME);
+	this->tileMap = new TileMap(this->stateData->gridSize, 40, 30, "Resources/Images/Tile_textures/tileSelector_1.png");
+	this->tileMap->loadFromFile("test_map.map");
 }
 
 void GameState::initializeEnemy()
 {
-	this->activeEnemies.push_back(this->testenemy);
-	this->activeEnemies.push_back(this->blob);
-	this->activeEnemies.push_back(this->snake);
+	this->activeEnemies.push_back(new Enemy(1200.f, 500.f, this->textures["TEST_ENEMY_IDLE"], "testenemy", INGAME));
+	this->activeEnemies.push_back(new Enemy(600.f, 700.f, this->textures["BLOB_ENEMY_IDLE"], "blob", INGAME));
+	this->activeEnemies.push_back(new Enemy(900.f, 300.f, this->textures["MECHA_SNAKE_IDLE"], "snake", INGAME));
 }
 
 void GameState::initializePlayers()
 {
-	this->player = new Player(20.f, 20.f, this->textures["PLAYER_SHEET"], "ingame");
+	this->player = new Player(900.f, 500.f, this->textures["PLAYER_SHEET"], "ingame");
+
+	this->player->loadStatsFromFile("player_stats_start.txt", this->hp, this->defence, this->baseDmg, this->maxDmg, this->mana, this->exp, this->lvl, this->dead);
+	this->player->saveStatsToFile("player_stats.txt", this->hp, this->defence, this->baseDmg, this->maxDmg, this->mana, this->exp, this->lvl, this->dead);
 }
 
-//Constructors/destructors
-GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<States*>* states)
-	: States(window, supportedKeys, states)
+//Constructor/destructor
+GameState::GameState(StateData* state_data)
+	: States(state_data)
 {
+	this->initializeDeferredRender();
+	this->initializeVariables();
+	this->initializeView();
 	this->initializeKeybinds();
 	this->initializeFonts();
 	this->initializeTextures();
-
 	this->initializePauseMenu();
-
 	this->initializePlayers();
-	this->CreateEnemy();
 	this->initializeEnemy();
+	this->initializeTileMap();
 }
 
 GameState::~GameState()
 {
 	delete this->pausemenu;
-	delete this->fightstate;
 
 	delete this->player;
-	delete this->testenemy;
-	delete this->blob;
-	delete this->snake;
 	this->activeEnemies.clear();
+	delete this->tileMap;
 }
 
-void GameState::deleteEnemy(const int i)
+void GameState::deleteEnemy(int i)
 {
-	delete this->activeEnemies[i];
+	if (this->dead == 1)
+	{
+		std::cout << "\npora¿ka\n";
+	}
+	else
+	{
+		this->activeEnemies.erase(activeEnemies.begin() + i);
+	}
 }
 
 //functions
@@ -158,18 +177,12 @@ void GameState::updatePausedInput(const float& dtime)
 	}
 }
 
-//void GameState::updateFightState(const float& dtime)
-//{
-//
-//}
-
 void GameState::checkForCollision(const float& dtime)
 {
 	this->playerbox = this->player->getGlobalBounds();
 
 	for (unsigned i = 0; i < this->activeEnemies.size(); i++)
 	{
-		this->activeEnemy = this->activeEnemies[i];
 		this->enemybox = this->activeEnemies[i]->getGlobalBounds();
 		this->enemyName = this->activeEnemies[i]->getName();
 
@@ -216,14 +229,18 @@ void GameState::checkForCollision(const float& dtime)
 				this->player->stopSpeedX();
 				this->player->setPosition(enemybox.left + enemybox.width, playerbox.top);
 			}
-			this->fightstate = new FightState(this->window, this->supportedKeys, this->states, this->activeEnemies[i], this->enemyName);
-			this->states->push(this->fightstate);
-			/*if (this->fightstate->enemyDeath() == true)
-			{
-				delete this->activeEnemies[i];
-			}*/
+			this->states->push(new FightState(this->stateData, this->activeEnemies[i], this->enemyName));
+
+			this->player->loadStatsFromFile("player_stats.txt", this->hp, this->defence, this->baseDmg, this->maxDmg, this->mana, this->exp, this->lvl, this->dead);
+			this->deleteEnemy(i);
 		}
 	}
+}
+
+//updates
+void GameState::updateView(const float& dtime)
+{
+	this->view.setCenter(this->player->getPosition().x + this->player->getGlobalBounds().width, this->player->getPosition().y + this->player->getGlobalBounds().height);
 }
 
 void GameState::updatePausedMenuButtons()
@@ -235,19 +252,20 @@ void GameState::updatePausedMenuButtons()
 
 	if (this->pausemenu->isButtonPressed("SETTINGS") && this->getKeyTime())
 	{
-		this->states->push(new SettingsState(this->window, this->supportedKeys, this->states));
+		this->states->push(new SettingsState(this->stateData));
 	}
 }
 
 void GameState::update(const float& dtime)
 {
+	this->updateMousePositions(&this->view);
 	this->updateKeyTime(dtime);
 	this->updatePausedInput(dtime);
-	this->updateMousePositions();
 
 	//unpaused update
 	if (!this->paused)
 	{
+		this->updateView(dtime);
 		this->updateInput(dtime);
 
 		this->player->update(dtime);
@@ -255,32 +273,42 @@ void GameState::update(const float& dtime)
 		for (unsigned i = 0; i < this->activeEnemies.size(); i++)
 		{
 			this->activeEnemies[i]->update(dtime);
-			/*this->testenemy->update(dtime);
-			this->blob->update(dtime);
-			this->snake->update(dtime);*/
 		}
 	}
 	//pause update
 	else
 	{
-		this->pausemenu->update(this->mousePositionView);
+		this->pausemenu->update(this->mousePositionWindow);
 		this->updatePausedMenuButtons();
 	}
 }
 
+//render
 void GameState::render(sf::RenderTarget* target)
 {
 	if (!target)
 		target = this->window;
 
-	this->player->render(*target);
+	this->renderTexture.clear();
 
-	this->testenemy->render(*target);
-	this->blob->render(*target);
-	this->snake->render(*target);
+	this->renderTexture.setView(this->view);
+	this->tileMap->render(this->renderTexture);
+
+	this->player->render(this->renderTexture);
+
+	for (unsigned i = 0; i < this->activeEnemies.size(); i++)
+	{
+		this->activeEnemies[i]->render(this->renderTexture);
+	}
 
 	if (this->paused) //render for paused
 	{
-		this->pausemenu->render(*target);
+		this->renderTexture.setView(this->renderTexture.getDefaultView());
+		this->pausemenu->render(this->renderTexture);
 	}
+
+	//final render
+	this->renderTexture.display();
+	this->renderSprite.setTexture(this->renderTexture.getTexture());
+	target->draw(this->renderSprite);
 }

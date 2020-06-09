@@ -15,9 +15,67 @@ MovementComponent::~MovementComponent()
 }
 
 //accessors
+const float& MovementComponent::getMaxSpeed() const
+{
+	return this->maxspeed;
+}
+
 const sf::Vector2f& MovementComponent::getSpeed() const
 {
 	return this->speed;
+}
+
+const bool MovementComponent::getMoveState(const short unsigned state) const
+{
+
+	switch (state)
+	{
+	case IDLE:
+		if (this->speed.x == 0.f && this->speed.y == 0.f)
+		{
+			return true;
+		}
+		break;
+
+	case MOVING:
+		if (this->speed.x != 0.f || this->speed.y != 0.f)
+		{
+			return true;
+		}
+		break;
+
+	case MOVINGLEFT:
+		if (this->speed.x < 0.f)
+		{
+			return true;
+		}
+		break;
+
+	case MOVINGRIGHT:
+		if (this->speed.x > 0.f)
+		{
+			return true;
+		}
+		break;
+
+	case MOVINGUP:
+		if (this->speed.y < 0.f)
+		{
+			return true;
+		}
+		break;
+
+	case MOVINGDOWN:
+		if (this->speed.y > 0.f)
+		{
+			return true;
+		}
+		break;
+
+	default:
+		break;
+	}
+	return false;
 }
 
 //functions

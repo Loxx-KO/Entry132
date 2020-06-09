@@ -9,7 +9,6 @@ void FightState::initializeVariables()
 
 	this->enemyCount = 1;
 	this->gainEXP = 0;
-	this->playerHpTemp = playerHp;
 }
 
 void FightState::initializeTextures()
@@ -48,16 +47,6 @@ void FightState::initializeTextures()
 void FightState::initializePlayer()
 {
 	this->player_fight = new Player(300.f, 270.f, this->textures["FIGHT_IDLE"], "infight");
-
-	playerDMG = (rand() % player_fight->getStatsMaxDMG() + player_fight->getStatsBaseDMG());
-
-	this->playerHp = this->player_fight->getStatsHP();
-	this->playerDef = this->player_fight->getStatsDefence();
-	this->playerMana = this->player_fight->getStatsMana();
-	this->playerExp = this->player_fight->getStatsExp();
-
-	std::cout << "\nPLAYER DMG" << playerDMG << "\nHP" << playerHp << "\nDEF" << playerDef << "\nEXP" << playerExp << "\n";
-	this->initializeBars();
 }
 
 void FightState::initializeBackground()
@@ -131,24 +120,24 @@ void FightState::initializeButtons()
 void FightState::initializeBars()
 {
 	//player
-	this->playerBar = new Bar(40.f, 650.f, playerBarWidth + 10.f, 40.f, &this->textures["BAR"]);
-
 	this->playerBarWidth = playerHp * 1.f;
 	this->PlayerBarHp.setPosition(45.f, 655.f);
 	this->PlayerBarHp.setTexture(&this->textures["HP"]);
 	this->PlayerBarHp.setSize(sf::Vector2f(playerBarWidth, 30.f));
 
-	//enemy
-	this->enemyBar = new Bar(1010.f, 650.f, (enemyBarWidth*enemyCount) + 10.f , 40.f, &this->textures["BAR"]);
+	this->playerBar = new Bar(40.f, 650.f, playerBarWidth + 10.f, 40.f, &this->textures["BAR"]);
 
+	//enemy
 	this->enemyBarWidth = enemyHp * 1.f;
 	this->enemyBarHp.setPosition(1015.f, 655.f);
 	this->enemyBarHp.setTexture(&this->textures["HP"]);
 	this->enemyBarHp.setSize(sf::Vector2f(enemyBarWidth, 30.f));
+
+	this->enemyBar = new Bar(1010.f, 650.f, enemyBarWidth + 10.f, 40.f, &this->textures["BAR"]);
 }
 
-FightState::FightState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<States*>* states, Enemy* enemy, std::string enemyName)
-	:States(window, supportedKeys, states)
+FightState::FightState(StateData* state_data, Enemy* enemy, std::string enemyName)
+	: States(state_data), keytimeMax(1.f), keytime(0.f)
 {
 	this->initializeVariables();
 	this->initializePlayer();
@@ -158,6 +147,13 @@ FightState::FightState(sf::RenderWindow* window, std::map<std::string, int>* sup
 	this->initializeKeybinds();
 	this->initializeButtons();
 
+	//player
+	this->player_fight->loadStatsFromFile("player_stats.txt", this->playerHp, this->playerDef, this->playerBaseDMG, this->playerMaxDMG, this->playerMana, this->playerCurrentExp, this->playerLvl, this->playerdead);
+	this->playerExp = this->playerCurrentExp;
+
+	std::cout << "\nHP" << playerHp << "\nDEF" << playerDef << "\nEXP" << playerExp << "\n";
+
+	//enemy
 	this->enemyCount = rand() % 3 + 1;
 	this->enemies = new Enemy * [this->enemyCount];
 	this->enemyHp = 0;
@@ -179,7 +175,6 @@ FightState::FightState(sf::RenderWindow* window, std::map<std::string, int>* sup
 			this->enemyHp = enemies[i]->getEnemyHP() + this->enemyHp;
 			this->enemyExp = enemies[i]->getEnemyExp() * (this->enemyCount);
 			this->enemyDMG = (rand() % enemies[i]->getEnemyMaxDMG() + enemies[i]->getEnemyBaseDMG()) * (this->enemyCount);
-			this->initializeBars();
 		}
 	}
 
@@ -197,7 +192,6 @@ FightState::FightState(sf::RenderWindow* window, std::map<std::string, int>* sup
 			this->enemyHp = enemies[i]->getEnemyHP() + this->enemyHp;
 			this->enemyExp = enemies[i]->getEnemyExp() * (this->enemyCount);
 			this->enemyDMG = (rand() % enemies[i]->getEnemyMaxDMG() + enemies[i]->getEnemyBaseDMG()) * (this->enemyCount);
-			this->initializeBars();
 		}
 	}
 
@@ -215,11 +209,12 @@ FightState::FightState(sf::RenderWindow* window, std::map<std::string, int>* sup
 			this->enemyHp = enemies[i]->getEnemyHP() + this->enemyHp;
 			this->enemyExp = enemies[i]->getEnemyExp() * (this->enemyCount);
 			this->enemyDMG = (rand() % enemies[i]->getEnemyMaxDMG() + enemies[i]->getEnemyBaseDMG()) * (this->enemyCount);
-			this->initializeBars();
 		}
 	}
 
 	std::cout << "\nENEMY  hp" << enemyHp << enemyName << "\n exp" << enemyExp << "\nDMG" << enemyDMG;			//for testing del later
+
+	this->initializeBars();
 }
 
 FightState::~FightState()
@@ -246,7 +241,6 @@ FightState::~FightState()
 //functions
 void FightState::enemyAttack()
 {
-	playerHpTemp = playerHp;
 	playerHp = playerHp - enemyDMG;
 
 	playerBarWidth = playerHp * 1.f;
@@ -261,7 +255,8 @@ void FightState::enemyAttack()
 
 void FightState::attack()
 {
-	enemyHpTemp = enemyHp;
+	playerDMG = (rand() % this->playerMaxDMG + this->playerBaseDMG);
+
 	enemyHp = enemyHp - playerDMG;
 
 	enemyBarWidth = enemyHp * 1.f;
@@ -276,8 +271,6 @@ void FightState::attack()
 
 void FightState::defend()
 {
-	playerHpTemp = playerHp;
-
 	playerBarWidth = playerHp * 1.f;
 
 	if(playerDef < enemyDMG)
@@ -287,7 +280,7 @@ void FightState::defend()
 
 	if (playerHp <= 0)
 	{
-		playerdead = true;
+		playerdead = 1;
 	}
 }
 
@@ -301,11 +294,15 @@ void FightState::tryRun()
 	int escaped = rand() % 10 + 1;
 	if (this->runChance >= escaped)
 	{
-		this->states->pop();
+		this->endState();
 		turn = true;
 	}
 	else
 	{
+		playerHp = playerHp - enemyDMG;
+
+		playerBarWidth = playerHp * 1.f;
+
 		std::cout << "\nCouldn't escape the battle!\n";
 		turn = false;
 	}
@@ -319,22 +316,21 @@ void FightState::checkIfAnyoneDead()
 		playerExp = playerExp + enemyExp;
 		std::cout << "EXP gain: " << playerExp << "\n";
 
-		currentEnemies.clear();
-		this->states->pop();
+		this->player_fight->saveStatsToFile("player_stats.txt", this->playerHp, this->playerDef, this->playerBaseDMG, this->playerMaxDMG, this->playerMana, this->playerExp, this->playerLvl, this->playerdead);
 
-		turn = true;
+		currentEnemies.clear();
+
+		this->endState();
 	}
-	else if (playerdead == true)
+	else if (playerdead == 1)
 	{
-		playerHp = 1;
+		playerHp = 0;
 
 		playerBarWidth = 1 * 1.f;
 
-		std::cout << "porażka\n";
+		this->player_fight->saveStatsToFile("player_stats.txt", this->playerHp, this->playerDef, this->playerBaseDMG, this->playerMaxDMG, this->playerMana, this->playerExp, this->playerLvl, this->playerdead);
 
-		this->states->pop();
-
-		turn = true;
+		this->endState();
 	}
 }
 
@@ -347,65 +343,69 @@ void FightState::changeBarSize()
 	this->enemyBarHp.setSize(sf::Vector2f(enemyBarWidth, 30.f));
 }
 
-//bool FightState::enemyDead()
-//{
-//	if (death == true)
-//	{
-//		return true;
-//	}
-//	return false;
-//}
+const bool FightState::getKeyTime()
+{
+	if (this->keytime >= this->keytimeMax)
+	{
+		this->keytime = 0.f;
+		return true;
+	}
+
+	return false;
+}
 
 void FightState::updateInput(const float& dtime)
 {
 
 }
 
-void FightState::updateButtons()
+void FightState::updateKeyTime(const float& dtime)
 {
+	if (this->keytime < this->keytimeMax)
+	{
+		this->keytime += 5.f * dtime;
+	}
+}
+
+void FightState::updateButtons(const float& dtime)
+{
+	this->updateKeyTime(dtime);
+
 	for (auto i : this->buttons)
 	{
-		i.second->update(this->mousePositionView);
+		i.second->update(this->mousePositionWindow);
 	}
 
 	//fighting
 	if (turn == true)
 	{
 
-		if (this->buttons["FIGHT"]->isPressed())
+		if (this->buttons["FIGHT"]->isPressed() && this->getKeyTime())
 		{
-			sleepFor();
-
 			attack();
 			changeBarSize();
 			turn = false;
 		}
 
 		//fighting
-		if (this->buttons["DEFEND"]->isPressed())
+		if (this->buttons["DEFEND"]->isPressed() && this->getKeyTime())
 		{
-			sleepFor();
-
 			defend();
 			changeBarSize();
 			turn = false;
 		}
 
 		//fighting
-		if (this->buttons["USE_ITEM"]->isPressed())
+		if (this->buttons["USE_ITEM"]->isPressed() && this->getKeyTime())
 		{
-			sleepFor();
-
 			useItem();
 			changeBarSize();
 			turn = false;
 		}
 
 		//Finish fight
-		if (this->buttons["RUN"]->isPressed())
+		if (this->buttons["RUN"]->isPressed() && this->getKeyTime())
 		{
-			sleepFor();
-
 			tryRun();
 
 			changeBarSize();
@@ -417,8 +417,6 @@ void FightState::updateButtons()
 	//enemyTurn
 	if (turn == false)
 	{
-		sleepFor();
-
 		enemyAttack();
 
 		changeBarSize();
@@ -431,22 +429,10 @@ void FightState::updateButtons()
 void FightState::update(const float& dtime)
 {
 	this->updateMousePositions();
+	this->updateKeyTime(dtime);
 	this->updateInput(dtime);
 
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-	{
-		for (auto i : this->buttons)
-		{
-			i.second->updateButtonTime(dtime);
-		}
-	}
-
-	this->updateButtons();
-}
-
-void FightState::sleepFor()
-{
-	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	this->updateButtons(dtime);
 }
 
 void FightState::renderButtons(sf::RenderTarget& target)

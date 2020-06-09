@@ -77,8 +77,8 @@ void MainMenuState::initializeButtons()
 }
 //
 
-MainMenuState::MainMenuState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<States*>* states)
-	: States(window, supportedKeys, states)
+MainMenuState::MainMenuState(StateData* state_data)
+	: States(state_data)
 {
 	this->initializeVariables();
 	this->initializeBackground();
@@ -105,13 +105,13 @@ void MainMenuState::updateButtons()
 {
 	for(auto i : this->buttons)
 	{
-		i.second->update(this->mousePositionView);
+		i.second->update(this->mousePositionWindow);
 	}
 
 	//New game
 	if (this->buttons["NEW_GAME"]->isPressed())
 	{
-		this->states->push(new GameState(this->window, this->supportedKeys, this->states));
+		this->states->push(new GameState(this->stateData));
 	}
 
 	//Load game
@@ -123,7 +123,7 @@ void MainMenuState::updateButtons()
 	//Settings
 	if (this->buttons["SETTINGS"]->isPressed())
 	{
-		this->states->push(new SettingsState(this->window, this->supportedKeys, this->states));
+		this->states->push(new SettingsState(this->stateData));
 	}
 
 	//Quit the game
@@ -134,7 +134,7 @@ void MainMenuState::updateButtons()
 
 	if (this->buttons["EDITOR_STATE"]->isPressed())
 	{
-		this->states->push(new EditorState(this->window, this->supportedKeys, this->states));
+		this->states->push(new EditorState(this->stateData));
 	}
 }
 

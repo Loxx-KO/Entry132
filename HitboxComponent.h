@@ -5,11 +5,10 @@ class HitboxComponent
 private:
 	sf::Sprite& sprite;
 	sf::RectangleShape hitbox;
-	sf::RectangleShape hitboxEnemy;
 	float offsetx;
 	float offsety;
 
-	sf::FloatRect nextPosition;
+	sf::FloatRect box;
 
 public:
 	HitboxComponent(sf::Sprite& sprite, 
@@ -25,7 +24,7 @@ public:
 	void setPosition(const float x, const float y);
 
 	//functions
-
+	bool collision(sf::FloatRect box);
 	void update();
 	void render(sf::RenderTarget& target);
 };

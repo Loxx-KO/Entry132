@@ -43,6 +43,11 @@ void HitboxComponent::setPosition(const float x, const float y)
 
 //functions
 
+bool HitboxComponent::collision(sf::FloatRect box)
+{
+	return this->hitbox.getGlobalBounds().intersects(box);
+}
+
 void HitboxComponent::update()
 {
 	this->hitbox.setPosition(this->sprite.getPosition().x + this->offsetx, this->sprite.getPosition().y + this->offsety); //will keep its size

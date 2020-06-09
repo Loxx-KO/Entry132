@@ -1,9 +1,10 @@
 #pragma once
-#include "GameState.h"
+#include "States.h"
 #include "Button.h"
-#include "EditorState.h"
+#include "GameState.h"
+#include "MainMenuState.h"
 
-class MainMenuState :
+class GameOver :
 	public States
 {
 private:
@@ -22,8 +23,8 @@ private:
 	void initializeButtons();
 
 public:
-	MainMenuState(StateData* state_data);
-	virtual ~MainMenuState();
+	GameOver(StateData* state_data);
+	virtual ~GameOver();
 
 	//functions
 

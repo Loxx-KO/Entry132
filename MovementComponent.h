@@ -1,5 +1,15 @@
 #pragma once
 
+enum MovementStates
+{
+	IDLE = 0,
+	MOVING,
+	MOVINGLEFT,
+	MOVINGRIGHT,
+	MOVINGUP,
+	MOVINGDOWN,
+};
+
 class MovementComponent
 {
 private:
@@ -19,9 +29,12 @@ public:
 	virtual ~MovementComponent();
 
 	//accessors
+	const float& getMaxSpeed() const;
 	const sf::Vector2f& getSpeed() const;
 
 	//functions
+	const bool getMoveState(const short unsigned state) const;
+
 	void move(const float x, const float y, const float& dtime);
 	void stopMovement();
 	void stopMovementX();

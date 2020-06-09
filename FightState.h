@@ -3,6 +3,8 @@
 #include "States.h"
 #include "Button.h"
 #include "Bar.h"
+#include "PlayerStats.h"
+#include "GameOver.h"
 
 class FightState :
 	public States
@@ -15,17 +17,24 @@ private:
 
 	std::map<std::string, Button*> buttons;
 
+	float keytime;
+	const float keytimeMax;
+
 	//player
+	//PlayerStats player_stats;
 	Player* player_fight;
 
-	int playerHpTemp;
 	int playerHp;
 	int playerDef;
 	int playerMana;
+	int playerMaxDMG;
+	int playerBaseDMG;
 	int playerDMG;
+	int playerCurrentExp;
 	int playerExp;
+	int playerLvl;
 
-	bool playerdead;
+	int playerdead;
 	float playerBarWidth;
 	
 	//enemy
@@ -34,7 +43,6 @@ private:
 	Enemy** enemies;
 	std::vector<Enemy*> currentEnemies;
 
-	int enemyHpTemp;
 	int enemyHp;
 	int enemyDMG;
 	int enemyExp;
@@ -69,10 +77,11 @@ private:
 	void initializeBars();
 
 public:
-	FightState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<States*>* states, Enemy* enemy, std::string enemyName);
+	FightState(StateData* state_data, Enemy* enemy, std::string enemyName);
 	virtual ~FightState();
 
 	//accessors
+	const bool getKeyTime();
 
 	//functions
 
@@ -86,10 +95,10 @@ public:
 	void changeBarSize();
 
 	void updateInput(const float& dtime);
-	void updateButtons();
+	void updateKeyTime(const float& dtime);
+	void updateButtons(const float& dtime);
 	void update(const float& dtime);
 
-	void sleepFor();
 	void renderButtons(sf::RenderTarget& target);
 	void render(sf::RenderTarget* target = nullptr);
 };

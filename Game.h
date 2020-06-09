@@ -4,17 +4,18 @@
 #include "pch.h"
 #include "MainMenuState.h"
 #include "SettingsState.h"
+#include "GraphicsSettings.h"
 
 class Game
 {
 
 private:
+
 	//variables
+	GraphicsSettings graphicSettings;
+	StateData stateData;
 	sf::RenderWindow *window;
 	sf::Event Events;
-	std::vector<sf::VideoMode> VideoModes;
-	sf::ContextSettings window_settings;
-	bool fullscreen;
 
 	sf::Clock dtClock;
 	float dtime;
@@ -23,10 +24,14 @@ private:
 
 	std::map<std::string, int> supportedKeys;
 
+	float gridSize;
+
 	//functions
 	void initializeVariables();
+	void initializeGraphicSettings();
 	void initializeWindow();
 	void initalizeKeys();
+	void initializeStateData();
 	void initalizeStates();
 
 public:
