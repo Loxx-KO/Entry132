@@ -1,6 +1,14 @@
 #pragma once
 #include "Entity.h"
 
+enum STATUS
+{
+	INGAME = 0,
+	INFIGHT
+};
+
+//zrob tez enum dla enemyname by pominac te wszystkie ify
+
 struct Enemy :
 	public Entity
 {
@@ -17,7 +25,7 @@ private:
 
 public:
 
-	Enemy(float x, float y, sf::Texture& texture, std::string name);
+	Enemy(float x, float y, sf::Texture& texture, std::string name, const short unsigned STATE);
 	virtual ~Enemy();
 
 	//accessors
@@ -32,3 +40,4 @@ public:
 	void update(const float& dtime);
 
 };
+

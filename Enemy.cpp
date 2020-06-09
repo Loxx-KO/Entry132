@@ -3,56 +3,89 @@
 
 void Enemy::initializeVariables()
 {
-
+	this->name = "";
+	this->hp = 0;
+	this->baseDmg = 0;
+	this->maxDmg = 0;
+	this->exp = 0;
 }
 
-Enemy::Enemy(float x, float y, sf::Texture& texture, std::string name)
+Enemy::Enemy(float x, float y, sf::Texture& texture, std::string name, const short unsigned STATE)
 {
 	this->initializeVariables();
 
-	if (name == "testenemy")
+	switch (STATE)
 	{
-		this->createHitboxComponent(this->sprite, 0.f, 0.f, 70.f, 100.f);
-		this->createMovementComponent(0.f, 0.f, 0.f);
+	case INGAME:
+	{
+		if (name == "testenemy")
+		{
+			this->createHitboxComponent(this->sprite, 0.f, 0.f, 70.f, 100.f);
+			this->createMovementComponent(0.f, 0.f, 0.f);
 
-		this->setTexture(texture);
-		this->setPosition(x, y);
+			this->setTexture(texture);
+			this->setPosition(x, y);
+		}
 
-		this->name = "testenemy";
-		this->hp = 30;
-		this->baseDmg = 3;
-		this->maxDmg = 5;
-		this->exp = 15;
+		if (name == "blob")
+		{
+			this->createHitboxComponent(this->sprite, 0.f, 0.f, 70.f, 100.f);
+			this->createMovementComponent(0.f, 0.f, 0.f);
+
+			this->setTexture(texture);
+			this->setPosition(x, y);
+		}
+
+		if (name == "snake")
+		{
+			this->createHitboxComponent(this->sprite, 0.f, 0.f, 70.f, 100.f);
+			this->createMovementComponent(0.f, 0.f, 0.f);
+
+			this->setTexture(texture);
+			this->setPosition(x, y);
+		}
+	}
+	case INFIGHT:
+	{
+		if (name == "testenemy")
+		{
+			this->setTexture(texture);
+			this->setPosition(x, y);
+
+			this->name = "testenemy";
+			this->hp = 30;
+			this->baseDmg = 2;
+			this->maxDmg = 4;
+			this->exp = 15;
+		}
+
+		if (name == "blob")
+		{
+			this->setTexture(texture);
+			this->setPosition(x, y);
+
+			this->name = "blob";
+			this->hp = 20;
+			this->baseDmg = 1;
+			this->maxDmg = 3;
+			this->exp = 10;
+		}
+
+		if (name == "snake")
+		{
+			this->setTexture(texture);
+			this->setPosition(x, y);
+
+			this->name = "snake";
+			this->hp = 40;
+			this->baseDmg = 9;
+			this->maxDmg = 6;
+			this->exp = 25;
+		}
 	}
 
-	if (name == "blob")
-	{
-		this->createHitboxComponent(this->sprite, 0.f, 0.f, 70.f, 100.f);
-		this->createMovementComponent(0.f, 0.f, 0.f);
-
-		this->setTexture(texture);
-		this->setPosition(x, y);
-
-		this->name = "blob";
-		this->hp = 20;
-		this->baseDmg = 2;
-		this->maxDmg = 4;
-		this->exp = 8;
-	}
-
-	if (name == "snake")
-	{
-		this->createHitboxComponent(this->sprite, 0.f, 0.f, 70.f, 100.f);
-		this->createMovementComponent(0.f, 0.f, 0.f);
-
-		this->setTexture(texture);
-		this->setPosition(x, y);
-
-		this->name = "snake";
-		this->hp = 40;
-		this->baseDmg = 5;
-		this->maxDmg = 8;
-		this->exp = 25;
+	default:
+		break;
 	}
 }
 
@@ -95,6 +128,13 @@ const std::string Enemy::getName() const
 //functions
 void Enemy::update(const float& dtime)
 {
-	this->movementComponent->update(dtime);
-	this->hitboxComponent->update();
+	if (INGAME)
+	{
+		this->movementComponent->update(dtime);
+		this->hitboxComponent->update();
+	}
+	else if (INFIGHT)
+	{
+
+	}
 }

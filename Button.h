@@ -4,7 +4,7 @@
 enum button_states		//list of values for button states
 {
 	BUTTON_IDLE = 0,
-    	BUTTON_HOVER,
+    BUTTON_HOVER,
 	BUTTON_PRESSED
 };
 
@@ -45,6 +45,7 @@ public:
 
 	//functions
 	virtual void updateButtonTime(const float& dtime);
-	void update(const sf::Vector2f& mousePosition);
+	void update(const sf::Vector2i& mousePositionWindow);
 	void render(sf::RenderTarget& target);
 };
+

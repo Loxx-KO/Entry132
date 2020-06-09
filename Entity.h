@@ -30,6 +30,7 @@ public:
 	void createAnimationComponent(sf::Texture& sprite_sheet);
 
 	//accessors
+	virtual const sf::Vector2f& getPosition() const;
 	const sf::FloatRect getGlobalBounds() const;
 	const sf::Vector2f& getMovementSpeed() const;
 

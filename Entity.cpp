@@ -43,6 +43,11 @@ void Entity::createAnimationComponent(sf::Texture& sprite_sheet)
 	this->animationComponent = new AnimationComponent(this->sprite, sprite_sheet);
 }
 
+const sf::Vector2f& Entity::getPosition() const
+{
+	return this->sprite.getPosition();
+}
+
 //accessors
 const sf::FloatRect Entity::getGlobalBounds() const
 {
@@ -61,6 +66,10 @@ const sf::Vector2f& Entity::getMovementSpeed() const
 //functions
 void Entity::setPosition(const float x, const float y)
 {
+	if (this->hitboxComponent)
+	{
+		this->hitboxComponent->setPosition(x, y);
+	}
 	this->sprite.setPosition(x,y);
 }
 
@@ -90,7 +99,6 @@ void Entity::stopSpeedY()
 	if (this->movementComponent)
 		this->movementComponent->stopMovementY();
 }
-
 
 void Entity::update(const float& dtime)
 {
