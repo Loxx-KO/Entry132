@@ -17,6 +17,8 @@
 #include <sstream>
 #include <stack>
 #include <map>
+#include <chrono>
+#include <thread>
 
 //SFML
 #include "SFML\Graphics.hpp"

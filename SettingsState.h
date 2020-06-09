@@ -23,7 +23,7 @@ private:
 	void initializeButtons();
 
 public:
-	SettingsState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<States*>* states);
+	SettingsState(StateData* state_data);
 	virtual ~SettingsState();
 
 	//functions

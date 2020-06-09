@@ -59,11 +59,11 @@ const bool PausedMenu::isButtonPressed(const std::string key)
 	return this->buttons[key]->isPressed();
 }
 
-void PausedMenu::update(const sf::Vector2f mousePosition)
+void PausedMenu::update(const sf::Vector2i& mousePositionWindow)
 {
 	for (auto& i : this->buttons)
 	{
-		i.second->update(mousePosition);
+		i.second->update(mousePositionWindow);					//make an update key time for this too (one for buttons is in fightstate)
 	}
 }
 

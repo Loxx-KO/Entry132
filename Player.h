@@ -13,7 +13,12 @@ private:
 	int maxDmg;
 	int mana;
 	int exp;
+	bool dead;
+
 	std::string state;
+	std::string name;
+
+	bool idle;
 
 	//initialize functions
 	void initializeVariables();
@@ -24,15 +29,9 @@ public:
 	Player(float x, float y, sf::Texture& sprite_sheet, std::string state);
 	virtual ~Player();
 
-	//accessors
-	const int getStatsHP() const;
-	const int getStatsDefence() const;
-	const int getStatsBaseDMG() const;
-	const int getStatsMaxDMG() const;
-	const int getStatsMana() const;
-	const int getStatsExp() const;
-
 	//functions
+	void loadStatsFromFile(const std::string file_name, int& Hp, int& Defence, int& BaseDmg, int& MaxDmg, int& Mana, int& Exp, int& Lvl, int& ifdead);
+	void saveStatsToFile(const std::string file_name, int Hp, int Defence, int BaseDmg, int MaxDmg, int Mana, int Exp, int Lvl, int ifdead);
 	virtual void update(const float& dtime);
 };
 

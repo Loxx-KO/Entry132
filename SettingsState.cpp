@@ -61,8 +61,8 @@ void SettingsState::initializeButtons()
 		sf::Color(125, 1, 47, 200), sf::Color(145, 1, 55, 200), sf::Color(166, 2, 63, 200));
 }
 
-SettingsState::SettingsState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<States*>* states)
-	:States(window,supportedKeys,states)
+SettingsState::SettingsState(StateData* state_data)
+	:States(state_data)
 {
 	this->initializeVariables();
 	this->initializeBackground();
@@ -89,7 +89,7 @@ void SettingsState::updateButtons()
 {
 	for (auto i : this->buttons)
 	{
-		i.second->update(this->mousePositionView);
+		i.second->update(this->mousePositionWindow);
 	}
 
 	//Fullscreen off/on
