@@ -154,6 +154,7 @@ FightState::FightState(StateData* state_data, Enemy* enemy, std::string enemyNam
 	std::cout << "\nHP" << playerHp << "\nDEF" << playerDef << "\nEXP" << playerExp << "\n";
 
 	//enemy
+	this->enemyName = enemyName;
 	this->enemyCount = rand() % 3 + 1;
 	this->enemies = new Enemy * [this->enemyCount];
 	this->enemyHp = 0;
@@ -276,7 +277,9 @@ void FightState::defend()
 	if(playerDef < enemyDMG)
 		playerHp = playerHp + playerDef - enemyDMG;
 
-	std::cout << "\nplayer defence PlayerHP:" << playerHp << "\n";
+	playerMana += 10;
+
+	std::cout << "\nplayer defence \nPlayerHP: " << playerHp << "\nPlayer mana: " << playerMana << "\n";
 
 	if (playerHp <= 0)
 	{
@@ -287,6 +290,8 @@ void FightState::defend()
 void FightState::useItem()
 {
 	std::cout << "\nusing item\n";
+
+	playerHp += 30;
 }
 
 void FightState::tryRun()
@@ -312,9 +317,8 @@ void FightState::checkIfAnyoneDead()
 {
 	if (enemydead == true)
 	{
-		std::cout << "wygrana\n";
 		playerExp = playerExp + enemyExp;
-		std::cout << "EXP gain: " << playerExp << "\n";
+		this->lvlUp();
 
 		this->player_fight->saveStatsToFile("player_stats.txt", this->playerHp, this->playerDef, this->playerBaseDMG, this->playerMaxDMG, this->playerMana, this->playerExp, this->playerLvl, this->playerdead);
 
@@ -332,6 +336,28 @@ void FightState::checkIfAnyoneDead()
 
 		this->endState();
 	}
+}
+
+void FightState::lvlUp()
+{
+		int lvl[3];
+		lvl[0] = 0;
+		lvl[1] = 100;
+		lvl[2] = 200;
+
+		if (this->playerExp >= lvl[1] && this->playerLvl == 0)
+		{
+			this->playerExp -= lvl[1];
+			this->playerLvl++;
+			std::cout << "\nLEVEL UP!\n LVL atm: " << this->playerLvl << "\n";
+		}
+		if (this->playerExp >= lvl[2] && this->playerLvl == 1)
+		{
+			this->playerExp -= lvl[2];
+			this->playerLvl++;
+			std::cout << "\nLEVEL UP!\n LVL atm: " << this->playerLvl << "\n";
+		}
+
 }
 
 void FightState::changeBarSize()
@@ -433,6 +459,8 @@ void FightState::update(const float& dtime)
 	this->updateInput(dtime);
 
 	this->updateButtons(dtime);
+
+	this->player_fight->updateInfight(dtime);
 }
 
 void FightState::renderButtons(sf::RenderTarget& target)
@@ -441,10 +469,7 @@ void FightState::renderButtons(sf::RenderTarget& target)
 	{
 		i.second->render(target);
 	}
-	for (int i = 0; i < this->enemyCount; i++)
-	{
-		this->enemies[i]->render(target);
-	}
+
 	this->playerBar->render(target);
 	target.draw(PlayerBarHp);
 
@@ -459,6 +484,11 @@ void FightState::render(sf::RenderTarget* target)
 
 	target->draw(this->background);
 	this->player_fight->render(*target);
+
+	for (int i = 0; i < this->enemyCount; i++)
+	{
+		this->enemies[i]->render(*target);
+	}
 
 	this->renderButtons(*target);
 }

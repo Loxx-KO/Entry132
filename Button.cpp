@@ -32,7 +32,7 @@ Button::Button(float x, float y, float width, float height,
 	this->buttontext.setCharacterSize(font_size);
 	this->buttontext.setPosition(
 		this->buttonshape.getPosition().x + (this->buttonshape.getGlobalBounds().width / 2.f) - this->buttontext.getGlobalBounds().width / 2.f,
-		this->buttonshape.getPosition().y + (this->buttonshape.getGlobalBounds().height / 2.f) - this->buttontext.getGlobalBounds().height / 2.f
+		this->buttonshape.getPosition().y + (this->buttonshape.getGlobalBounds().height / 2.f) - this->buttontext.getGlobalBounds().height / 1.5f
 	);
 
 	this->textIdleColor = text_idle_color;
@@ -56,14 +56,14 @@ const bool Button::isPressed() const
 }
 
 //functions
-void Button::update(const sf::Vector2f& mousePosition)
+void Button::update(const sf::Vector2i& mousePositionWindow)
 {
 	//update the bool for hover and pressed button
 
 	this->buttonState = BUTTON_IDLE;
 
 	//hover
-	if (this->buttonshape.getGlobalBounds().contains(mousePosition))
+	if (this->buttonshape.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePositionWindow)))
 	{
 		this->buttonState = BUTTON_HOVER;
 

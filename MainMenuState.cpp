@@ -111,12 +111,14 @@ void MainMenuState::updateButtons()
 	//New game
 	if (this->buttons["NEW_GAME"]->isPressed())
 	{
+		this->alive();
 		this->states->push(new GameState(this->stateData));
 	}
 
 	//Load game
 	if (this->buttons["LOAD_GAME"]->isPressed())
 	{
+		this->alive();
 		std::cout << "This button doesn't work yet\n";
 	}
 
@@ -142,6 +144,12 @@ void MainMenuState::update(const float& dtime)
 {
 	this->updateMousePositions();
 	this->updateInput(dtime);
+
+	/*if (this->load_game)
+	{
+		this->alive();
+		this->states->push(new GameState(this->stateData));
+	}*/
 
 	this->updateButtons();
 }

@@ -1,37 +1,30 @@
 #pragma once
-#include "States.h"
 #include "Button.h"
-#include "GameState.h"
-#include "MainMenuState.h"
 
-class GameOver :
-	public States
+class GameOver
 {
 private:
-	//variables
-	sf::Texture bgimage;
+	sf::Font& font;					//& <- to force the font - its needed to create the paused menu
+	sf::Text menutext;
+
 	sf::RectangleShape background;
-	sf::Font font;
+	sf::RectangleShape box;			//button box
 
 	std::map<std::string, Button*> buttons;
 
-	//functions
-	void initializeVariables();
-	void initializeBackground();
-	void initializeFonts();
-	void initializeKeybinds();
-	void initializeButtons();
+	//private functions
 
 public:
-	GameOver(StateData* state_data);
+	GameOver(sf::RenderWindow& window, sf::Font& font);
 	virtual ~GameOver();
 
-	//functions
+	//accessors
+	std::map<std::string, Button*>& getButtons();
 
-	void updateInput(const float& dtime);
-	void updateButtons();
-	void update(const float& dtime);
-	void renderButtons(sf::RenderTarget& target);
-	void render(sf::RenderTarget* target = nullptr);
+	//functions
+	void addButton(const std::string  key, float x, float y, const std::string text);
+	const bool isButtonPressed(const std::string key);
+	void update(const sf::Vector2i& mousePositionWindow);
+	void render(sf::RenderTarget& target);
 };
 

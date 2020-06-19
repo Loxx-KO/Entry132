@@ -37,7 +37,7 @@ public:
 	const std::string getName() const;
 
 	//functions
-	void update(const float& dtime);
+	virtual void update(const float& dtime);
 
 };
 

@@ -46,7 +46,9 @@ protected:
 
 	bool end;
 	bool paused;
-	bool fight;
+	bool player_dead;
+	bool load_game;
+	//bool newGame;
 
 	float keytime;
 	float keytimemax;
@@ -78,8 +80,11 @@ public:
 	void pauseState();
 	void unPausedState();
 
-	void fightStateNotActive();
-	void fightStateEnding();
+	void dead_check();
+	void alive();
+	void load_true();
+	void load_false();
+	//void dead_newGame();
 
 	virtual void updateKeyTime(const float& dtime);
 

@@ -2,74 +2,34 @@
 #include "GameOver.h"
 
 //initializer functions
-void GameOver::initializeVariables()
+GameOver::GameOver(sf::RenderWindow& window, sf::Font& font)
+	: font(font)
 {
-
-}
-
-void GameOver::initializeBackground()
-{
-	this->background.setSize
-	(sf::Vector2f
-	(static_cast<float>(this->window->getSize().x),
-		static_cast<float>(this->window->getSize().y))
+	//init bg
+	this->background.setSize(sf::Vector2f
+	(
+		static_cast<float>(window.getSize().x),
+		static_cast<float>(window.getSize().y))
 	);
 
-	if (!this->bgimage.loadFromFile("Resources/Images/Backgrounds/settingsmenubg.png"))
-	{
-		throw "ERROR GAMEOVER::BACKGROUND_LOADING_FAILED";
-	}
-	this->background.setTexture(&this->bgimage);
-}
+	this->background.setFillColor(sf::Color(56, 49, 51, 200));
 
-void GameOver::initializeFonts()
-{
-	if (!this->font.loadFromFile("Fonts/Neucha-Regular.ttf"))
-	{
-		throw("ERROR::GAMEOVER - FONT NOT LOADED"); //exits program and gives the "Error"
-	}
-}
+	//init button
+	this->box.setSize(sf::Vector2f
+	(
+		static_cast<float>(window.getSize().x / 2.f),
+		static_cast<float>(window.getSize().y - 90.f))
+	);
 
-void GameOver::initializeKeybinds()
-{
-	std::ifstream file("Config/settingsstate_keybinds.ini");
+	this->box.setFillColor(sf::Color(99, 65, 78, 160));
+	this->box.setPosition(window.getSize().x / 2.f - this->box.getSize().x / 2.f, 30.f);
 
-	if (file.is_open())
-	{
-		std::string key = "";
-		std::string key2 = "";
-
-		while (file >> key >> key2)
-		{
-			this->keybinds[key] = this->supportedKeys->at(key2);
-		}
-	}
-
-	file.close();
-}
-
-void GameOver::initializeButtons()
-{
-	this->buttons["NEW_GAME"] = new Button(760.f, 600.f, 400.f, 60.f,
-		&this->font, "New Game", 34,
-		sf::Color(237, 221, 226, 200), sf::Color(247, 218, 231, 200), sf::Color(255, 235, 244, 200),		//text color
-		sf::Color(125, 1, 47, 200), sf::Color(145, 1, 55, 200), sf::Color(166, 2, 63, 200));				//button color	
-
-	this->buttons["RETURN"] = new Button(760.f, 900.f, 400.f, 60.f,
-		&this->font, "Return to main menu", 34,
-		sf::Color(237, 221, 226, 200), sf::Color(247, 218, 231, 200), sf::Color(255, 235, 244, 200),
-		sf::Color(125, 1, 47, 200), sf::Color(145, 1, 55, 200), sf::Color(166, 2, 63, 200));
-}
-//
-
-GameOver::GameOver(StateData* state_data)
-	: States(state_data)
-{
-	this->initializeVariables();
-	this->initializeBackground();
-	this->initializeFonts();
-	this->initializeKeybinds();
-	this->initializeButtons();
+	//init text
+	this->menutext.setFont(font);
+	this->menutext.setFillColor(sf::Color(237, 221, 226, 200));
+	this->menutext.setCharacterSize(80);
+	this->menutext.setString("GAME OVER");
+	this->menutext.setPosition(this->box.getPosition().x + this->box.getSize().x / 2.f - this->menutext.getGlobalBounds().width / 2.f, this->box.getPosition().y + 70.f);
 }
 
 GameOver::~GameOver()
@@ -81,55 +41,42 @@ GameOver::~GameOver()
 	}
 }
 
-void GameOver::updateInput(const float& dtime)
+std::map<std::string, Button*>& GameOver::getButtons()
 {
-
+	return this->buttons;
 }
 
-void GameOver::updateButtons()
+//functions
+void GameOver::addButton(const std::string key, float x, float y, const std::string text)
 {
-	for (auto i : this->buttons)
-	{
-		i.second->update(this->mousePositionWindow);
-	}
+	this->buttons[key] = new Button(x, y, 400.f, 60.f,
+		&this->font, text, 34,
+		sf::Color(237, 221, 226, 200), sf::Color(247, 218, 231, 200), sf::Color(255, 235, 244, 200),		//text color
+		sf::Color(125, 1, 47, 200), sf::Color(145, 1, 55, 200), sf::Color(166, 2, 63, 200));
+}
 
-	//New game // later load last save
-	if (this->buttons["NEW_GAME"]->isPressed())
-	{
-		std::cout << "doesn't work";
-		this->states->pop();
-	}
+const bool GameOver::isButtonPressed(const std::string key)
+{
+	return this->buttons[key]->isPressed();
+}
 
-	//Return to main menu
-	if (this->buttons["RETURN"]->isPressed())
+void GameOver::update(const sf::Vector2i& mousePositionWindow)
+{
+	for (auto& i : this->buttons)
 	{
-		std::cout << "doesn't work";
-		this->states->pop();
+		i.second->update(mousePositionWindow);					//make an update key time for this too (one for buttons is in fightstate)
 	}
 }
 
-void GameOver::update(const float& dtime)
+void GameOver::render(sf::RenderTarget& target)
 {
-	this->updateMousePositions();
-	this->updateInput(dtime);
+	target.draw(this->background);
+	target.draw(this->box);
 
-	this->updateButtons();
-}
-
-void GameOver::renderButtons(sf::RenderTarget& target)
-{
-	for (auto i : this->buttons)
+	for (auto& i : this->buttons)
 	{
 		i.second->render(target);
 	}
-}
 
-void GameOver::render(sf::RenderTarget* target)
-{
-	if (!target)
-		target = this->window;
-
-	target->draw(this->background);
-
-	this->renderButtons(*target);
+	target.draw(this->menutext);
 }

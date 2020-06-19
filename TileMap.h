@@ -12,7 +12,7 @@ private:
 	unsigned layers;
 	sf::Vector2u maxSize;
 	std::string texture_file;
-	//std::vector < std::vector < std::vector < Tile* > > > map;  // x , y than tile
+
 	// Tile**** -> first we need to have Tile* (pointer to Tile class) and after that *** for each dimension
 	Tile**** map;
 	sf::Texture tileTextureSheet;

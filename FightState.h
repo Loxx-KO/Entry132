@@ -4,7 +4,6 @@
 #include "Button.h"
 #include "Bar.h"
 #include "PlayerStats.h"
-#include "GameOver.h"
 
 class FightState :
 	public States
@@ -43,6 +42,7 @@ private:
 	Enemy** enemies;
 	std::vector<Enemy*> currentEnemies;
 
+	std::string enemyName;
 	int enemyHp;
 	int enemyDMG;
 	int enemyExp;
@@ -91,6 +91,7 @@ public:
 	void useItem();
 	void tryRun();
 	void checkIfAnyoneDead();
+	void lvlUp();
 	
 	void changeBarSize();
 

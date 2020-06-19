@@ -1,8 +1,12 @@
 #include "pch.h"
 #include "GameState.h"
 
+//initializer functions
 void GameState::initializeDeferredRender()
 {
+	this->stackSizeBefore = 0;
+	this->stackSizeAfter = 1;
+
 	this->renderTexture.create(
 		this->stateData->gfxSettings->resolution.width, this->stateData->gfxSettings->resolution.height
 	);
@@ -12,10 +16,9 @@ void GameState::initializeDeferredRender()
 
 }
 
-//initializer functions
 void GameState::initializeVariables()
 {
-
+	this->load_false();
 }
 
 void GameState::initializeView()
@@ -85,6 +88,14 @@ void GameState::initializePauseMenu()
 	this->pausemenu->addButton("QUIT", 760.f, 700.f, "Quit");
 }
 
+void GameState::initializeGameOver()
+{
+	this->gameOver = new GameOver(*this->window, this->font);
+
+	//this->gameOver->addButton("LOAD_SAVE", 760.f, 500.f, "Load last save");
+	this->gameOver->addButton("RETURN", 760.f, 700.f, "Return to main menu");
+}
+
 void GameState::initializeTileMap()
 {
 	this->tileMap = new TileMap(this->stateData->gridSize, 40, 30, "Resources/Images/Tile_textures/tileSelector_1.png");
@@ -94,6 +105,7 @@ void GameState::initializeTileMap()
 void GameState::initializeEnemy()
 {
 	this->activeEnemies.push_back(new Enemy(1200.f, 500.f, this->textures["TEST_ENEMY_IDLE"], "testenemy", INGAME));
+	this->activeEnemies.push_back(new Enemy(1300.f, 100.f, this->textures["TEST_ENEMY_IDLE"], "testenemy", INGAME));
 	this->activeEnemies.push_back(new Enemy(600.f, 700.f, this->textures["BLOB_ENEMY_IDLE"], "blob", INGAME));
 	this->activeEnemies.push_back(new Enemy(900.f, 300.f, this->textures["MECHA_SNAKE_IDLE"], "snake", INGAME));
 }
@@ -117,6 +129,7 @@ GameState::GameState(StateData* state_data)
 	this->initializeFonts();
 	this->initializeTextures();
 	this->initializePauseMenu();
+	this->initializeGameOver();
 	this->initializePlayers();
 	this->initializeEnemy();
 	this->initializeTileMap();
@@ -125,25 +138,40 @@ GameState::GameState(StateData* state_data)
 GameState::~GameState()
 {
 	delete this->pausemenu;
+	delete this->gameOver;
 
 	delete this->player;
 	this->activeEnemies.clear();
 	delete this->tileMap;
 }
 
+//functions
 void GameState::deleteEnemy(int i)
 {
-	if (this->dead == 1)
-	{
-		std::cout << "\npora¿ka\n";
-	}
-	else
-	{
-		this->activeEnemies.erase(activeEnemies.begin() + i);
-	}
+	this->activeEnemies.erase(activeEnemies.begin() + i);
 }
 
-//functions
+void GameState::checkIfDead()
+{
+		this->player->loadStatsFromFile("player_stats.txt", this->hp, this->defence, this->baseDmg, this->maxDmg, this->mana, this->exp, this->lvl, this->dead);
+		std::cout << "\nEXP: " << this->exp << "\n";
+
+		if (this->dead == 0)
+		{
+			//std::cout << "\nwygrana\n";
+			deleteEnemy(this->enemyNumber);
+			this->dead = 0;
+			this->alive();
+			this->stackSizeAfter = 1;
+		}
+		else
+		{
+			//std::cout << "\nporazka\n";
+			this->dead_check();
+			this->stackSizeAfter = 1;
+		}
+}
+
 void GameState::updateInput(const float& dtime)
 {
 	checkForCollision(dtime);
@@ -229,10 +257,15 @@ void GameState::checkForCollision(const float& dtime)
 				this->player->stopSpeedX();
 				this->player->setPosition(enemybox.left + enemybox.width, playerbox.top);
 			}
+
+			this->enemyNumber = i;
 			this->states->push(new FightState(this->stateData, this->activeEnemies[i], this->enemyName));
 
-			this->player->loadStatsFromFile("player_stats.txt", this->hp, this->defence, this->baseDmg, this->maxDmg, this->mana, this->exp, this->lvl, this->dead);
-			this->deleteEnemy(i);
+			this->stackSizeAfter = 0;
+		}
+		else if(this->stackSizeBefore == this->stackSizeAfter)
+		{
+			checkIfDead();
 		}
 	}
 }
@@ -256,6 +289,20 @@ void GameState::updatePausedMenuButtons()
 	}
 }
 
+void GameState::updateGameOverButtons()
+{
+	if (this->gameOver->isButtonPressed("RETURN") && this->getKeyTime())
+	{
+		this->endState();
+	}
+
+	/*if (this->gameOver->isButtonPressed("LOAD_SAVE") && this->getKeyTime())
+	{
+		this->load_true();
+		this->endState();
+	}*/
+}
+
 void GameState::update(const float& dtime)
 {
 	this->updateMousePositions(&this->view);
@@ -263,7 +310,7 @@ void GameState::update(const float& dtime)
 	this->updatePausedInput(dtime);
 
 	//unpaused update
-	if (!this->paused)
+	if (!this->paused && !this->player_dead)
 	{
 		this->updateView(dtime);
 		this->updateInput(dtime);
@@ -276,10 +323,15 @@ void GameState::update(const float& dtime)
 		}
 	}
 	//pause update
-	else
+	else if(this->paused)
 	{
 		this->pausemenu->update(this->mousePositionWindow);
 		this->updatePausedMenuButtons();
+	}
+	else if(this->player_dead)
+	{
+		this->gameOver->update(this->mousePositionWindow);
+		this->updateGameOverButtons();
 	}
 }
 
@@ -305,6 +357,12 @@ void GameState::render(sf::RenderTarget* target)
 	{
 		this->renderTexture.setView(this->renderTexture.getDefaultView());
 		this->pausemenu->render(this->renderTexture);
+	}
+
+	if (this->player_dead) //render for dead
+	{
+		this->renderTexture.setView(this->renderTexture.getDefaultView());
+		this->gameOver->render(this->renderTexture);
 	}
 
 	//final render

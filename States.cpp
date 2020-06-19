@@ -10,7 +10,7 @@ States::States(StateData* state_data)
 
 	this->end = false;
 	this->paused = false;
-	this->fight = false;
+	this->player_dead = false;
 
 	this->keytime = 0.f;
 	this->keytimemax = 20.f;
@@ -56,17 +56,27 @@ void States::unPausedState()
 	this->paused = false;
 }
 
-void States::fightStateNotActive()
+void States::dead_check()
 {
-	this->fight = false;
+	this->player_dead = true;
 }
 
-void States::fightStateEnding()
+void States::alive()
 {
-	this->fight = true;
+	this->player_dead = false;
 }
 
+void States::load_true()
+{
+	this->load_game = true;
+}
 
+void States::load_false()
+{
+	this->load_game = false;
+}
+
+//update functions
 void States::updateKeyTime(const float& dtime)
 {
 	if (this->keytime < this->keytimemax)

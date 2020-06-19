@@ -20,29 +20,29 @@ Enemy::Enemy(float x, float y, sf::Texture& texture, std::string name, const sho
 	{
 		if (name == "testenemy")
 		{
+			this->setPosition(x, y);
 			this->createHitboxComponent(this->sprite, 0.f, 0.f, 70.f, 100.f);
 			this->createMovementComponent(0.f, 0.f, 0.f);
 
 			this->setTexture(texture);
-			this->setPosition(x, y);
 		}
 
 		if (name == "blob")
 		{
+			this->setPosition(x, y);
 			this->createHitboxComponent(this->sprite, 0.f, 0.f, 70.f, 100.f);
 			this->createMovementComponent(0.f, 0.f, 0.f);
 
 			this->setTexture(texture);
-			this->setPosition(x, y);
 		}
 
 		if (name == "snake")
 		{
+			this->setPosition(x, y);
 			this->createHitboxComponent(this->sprite, 0.f, 0.f, 70.f, 100.f);
 			this->createMovementComponent(0.f, 0.f, 0.f);
 
 			this->setTexture(texture);
-			this->setPosition(x, y);
 		}
 	}
 	case INFIGHT:
@@ -78,9 +78,9 @@ Enemy::Enemy(float x, float y, sf::Texture& texture, std::string name, const sho
 
 			this->name = "snake";
 			this->hp = 40;
-			this->baseDmg = 9;
-			this->maxDmg = 6;
-			this->exp = 25;
+			this->baseDmg = 90;
+			this->maxDmg = 100;
+			this->exp = 40;
 		}
 	}
 
@@ -128,13 +128,6 @@ const std::string Enemy::getName() const
 //functions
 void Enemy::update(const float& dtime)
 {
-	if (INGAME)
-	{
-		this->movementComponent->update(dtime);
-		this->hitboxComponent->update();
-	}
-	else if (INFIGHT)
-	{
-
-	}
+	this->movementComponent->update(dtime);
+	this->hitboxComponent->update();
 }

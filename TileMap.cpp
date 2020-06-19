@@ -31,21 +31,6 @@ TileMap::TileMap(float gridSize, unsigned width, unsigned height, std::string te
 
 	//initializing map
 
-	/*this->map.resize(this->maxSize.x, std::vector<Tile*>();
-	for (size_t x = 0; x < maxSize.x; x++)
-	{
-
-		for (size_t y = 0; y < maxSize.y; y++)
-		{
-			this->map[x].resize(this->maxSize.y, std::vector<Tile*>());
-
-			for (size_t z = 0; z < this->layers; z++)
-			{
-				this->map[x][y].resize(this->layers, NULL);
-			}
-		}
-	}*/
-
 	map = new Tile *** [this->maxSize.x];
 	for (size_t x = 0; x < maxSize.x; x++)
 	{
@@ -223,18 +208,6 @@ void TileMap::update()
 
 void TileMap::render(sf::RenderTarget& target)
 {
-	/*for (auto& x : this->map)
-	{
-		for (auto& y : x)
-		{
-			for (auto* z : y)
-			{
-				if(z != nullptr)
-				z->render(target);
-			}
-		}
-	}*/
-
 	for (size_t x = 0; x < maxSize.x; x++)
 	{
 		for (size_t y = 0; y < maxSize.y; y++)

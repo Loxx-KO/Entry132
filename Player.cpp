@@ -25,6 +25,7 @@ void Player::initializeComponents()
 Player::Player(float x, float y, sf::Texture& sprite_sheet, std::string state)
 {
 	this->initializeVariables();
+	this->state = state;
 
 		if(state =="ingame")
 		{
@@ -52,7 +53,7 @@ Player::Player(float x, float y, sf::Texture& sprite_sheet, std::string state)
 			this->setPosition(x, y);
 
 			this->createAnimationComponent(sprite_sheet);
-			this->animationComponent->addAnimation("FIGHT_IDLE", 12.f, 0, 0, 0, 0, 329, 325);
+			this->animationComponent->addAnimation("FIGHT_IDLE", 6.f, 0, 0, 5, 0, 329, 325);
 		}
 }
 
@@ -118,7 +119,6 @@ void Player::saveStatsToFile(const std::string file_name , int Hp, int Defence, 
 void Player::update(const float& dtime)
 {
 	this->movementComponent->update(dtime);
-
 	if (this->movementComponent->getMoveState(MOVING))
 	{
 		//Down
@@ -150,10 +150,10 @@ void Player::update(const float& dtime)
 		this->animationComponent->play("IDLE_FRONT", dtime);
 	}
 
-	if (!this->movementComponent)
-	{
-		this->animationComponent->play("FIGHT_IDLE", dtime);
-	}
-
 	this->hitboxComponent->update();
+}
+
+void Player::updateInfight(const float& dtime)
+{
+	this->animationComponent->play("FIGHT_IDLE", dtime);
 }

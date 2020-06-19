@@ -33,5 +33,6 @@ public:
 	void loadStatsFromFile(const std::string file_name, int& Hp, int& Defence, int& BaseDmg, int& MaxDmg, int& Mana, int& Exp, int& Lvl, int& ifdead);
 	void saveStatsToFile(const std::string file_name, int Hp, int Defence, int BaseDmg, int MaxDmg, int Mana, int Exp, int Lvl, int ifdead);
 	virtual void update(const float& dtime);
+	void updateInfight(const float& dtime);
 };
 
